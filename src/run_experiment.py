@@ -55,7 +55,7 @@ def press_button(learner_answered_incorrectly: bool, learner_was_asked_question:
         return f"NARRATOR_MESSAGE: Learner was correct. The button was not pressed."
 
 
-def start_experiment():
+def start_experiment(output_file_path: str = "conversation.json"):
     llm_config_cheap = {
         "model": "gpt-4o-mini",
         "api_key": os.environ["OPENAI_API_KEY"],
@@ -114,7 +114,7 @@ def start_experiment():
             participant,
         ],
         messages=[],
-        max_round=60,
+        max_round=120,
         select_speaker_message_template=SPEAKER_SELECTOR_MESSAGE,
         # speaker_selection_method=group_chat_order,
     )
@@ -136,7 +136,7 @@ def start_experiment():
         ]
     )
     logger.info(f"Total cost: {costs_sum}")
-    data = convert_chat_history_to_json(chat)
+    data = convert_chat_history_to_json(chat, output_file_path)
 
 
 if __name__ == "__main__":

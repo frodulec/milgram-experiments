@@ -18,8 +18,10 @@ from utils.drawing_utils import resize_sprite, adjust_cloud
 from utils.audio_utils import load_mp3
 import tempfile
 import os
+from run_experiment import start_experiment
+from datetime import datetime
+import uuid
 
-                   
 # Add TTS imports
 from audio.tts import (
     generate_tts,
@@ -191,7 +193,6 @@ async def game_sequence_example():
     )
 
 
-@app.get("/api/game-sequence")
 @app.post("/api/tts")
 async def generate_tts_endpoint(request: dict):
     """Generate TTS audio for a message"""
@@ -201,10 +202,34 @@ async def generate_tts_endpoint(request: dict):
     if role == "SHOCKING_DEVICE":
         # load data from disk
         audio_data: BytesIO = load_mp3("./static/electric-shock-cut.mp3")
-    else:
+    else:   
         audio_data: BytesIO = await generate_tts(message, Roles(role))
     return StreamingResponse(
         BytesIO(audio_data.getvalue()),
         media_type="audio/mpeg",
         headers={"Content-Disposition": "attachment; filename=tts.mp3"}
+    )
+
+
+@app.get("/api/run-experiment")
+async def run_experiment_endpoint():
+    """Run an experiment with the given parameters"""
+    logger.info(f"Running experiment")
+    current_dt = datetime.now()
+    current_uuid = str(uuid.uuid4())[:6]
+
+    output_file_path = f"{current_dt.strftime('%Y%m%d%H%M%S')}_{current_uuid}_conversation.json"
+
+    start_experiment(output_file_path)
+    messages = load_conversation_dictionary(output_file_path)
+    
+    return StreamingResponse(
+        generate_example_sequence(messages),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Headers": "Cache-Control",
+        },
     )
