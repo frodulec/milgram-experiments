@@ -13,8 +13,9 @@ from typing import Tuple, List, Dict, Union
 import json
 import asyncio
 import base64
-from .utils.chat_utils import load_conversation_dictionary
-from .utils.drawing_utils import resize_sprite, adjust_cloud
+from utils.chat_utils import load_conversation_dictionary
+from utils.drawing_utils import resize_sprite, adjust_cloud
+from utils.audio_utils import load_mp3
 import tempfile
 import os
 
@@ -195,10 +196,13 @@ async def game_sequence_example():
 async def generate_tts_endpoint(request: dict):
     """Generate TTS audio for a message"""
     role = request.get("role")
-    message = request.get("message", "")
-    
+    message = request.get("message", "")    
     logger.info(f"Generating TTS for role: {role}, message: {message}")
-    audio_data = await generate_tts(message, Roles(role))
+    if role == "SHOCKING_DEVICE":
+        # load data from disk
+        audio_data: BytesIO = load_mp3("./static/electric-shock-cut.mp3")
+    else:
+        audio_data: BytesIO = await generate_tts(message, Roles(role))
     return StreamingResponse(
         BytesIO(audio_data.getvalue()),
         media_type="audio/mpeg",
