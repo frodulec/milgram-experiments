@@ -1,11 +1,10 @@
-from pydantic import BaseModel
+from models import LLMConfig
 import os
+from dotenv import load_dotenv
 
 
 
-class LLMConfig(BaseModel):
-    model: str
-    api_key: str
+load_dotenv()
 
 
 class GPT_4_1(LLMConfig):
