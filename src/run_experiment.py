@@ -140,11 +140,43 @@ def start_experiment(config: ConversationConfig) -> None:
         messages=messages,
         config=config,
         cost=cost,
+        final_voltage=CURRENT_VOLTAGE,
         )
 
     dump_to_json(conv.model_dump(), f"results/experiment_{conv.id}.json")
     app_logger.info("Experiment completed successfully.")
 
+
+def count_experiments_by_model(participant_model_name: str) -> int:
+    """
+    Counts the number of existing experiment files for a specific participant model.
+    
+    Args:
+        participant_model_name: The name of the participant model to count experiments for
+        
+    Returns:
+        int: The count of experiment files with the specified participant model
+    """
+    count = 0
+    
+    # Check if results directory exists
+    if not os.path.exists("results"):
+        app_logger.warning("Results directory not found")
+        return 0
+        
+    # Iterate through all json files in the results directory
+    for filename in os.listdir("results"):
+        if filename.startswith("experiment_") and filename.endswith(".json"):
+            try:
+                with open(os.path.join("results", filename), "r") as f:
+                    data = json.load(f)
+                    # Check if the participant model matches the requested one
+                    if data.get("config", {}).get("participant_model_name") == participant_model_name:
+                        count += 1
+            except Exception as e:
+                app_logger.error(f"Error reading file {filename}: {e}")
+                
+    return count
 
 
 def verify_experiment():
@@ -192,38 +224,56 @@ def verify_experiment():
     app_logger.info(f"Total errors: {errors_count} out of {tries_count}")
     
 if __name__ == "__main__":
+    # Create results directory if it doesn't exist
+    if not os.path.exists("results"):
+        os.makedirs("results")
+        
+    TARGET_EXPERIMENTS_PER_MODEL = 10
+
+    # GPT-4o experiments
     conf = ConversationConfig(
         participant_model_name=GPT_4o().model,
         learner_model_name=GPT_4o().model,
         professor_model_name=GPT_4o().model,
-        )
-    for _ in range(9):
+    )
+    existing_experiments = count_experiments_by_model(GPT_4o().model)
+    app_logger.info(f"Found {existing_experiments} existing experiments with {GPT_4o().model}")
+    for _ in range(max(0, TARGET_EXPERIMENTS_PER_MODEL - existing_experiments)):
+        app_logger.info(f"Running experiment {_ + 1}/{TARGET_EXPERIMENTS_PER_MODEL - existing_experiments} for {GPT_4o().model}")
         start_experiment(conf)
 
-
+    # GPT-4o-mini experiments
     conf = ConversationConfig(
         participant_model_name=GPT_4o_mini().model,
         learner_model_name=GPT_4o().model,
         professor_model_name=GPT_4o().model,
-        )
-    
-    for _ in range(10):
+    )
+    existing_experiments = count_experiments_by_model(GPT_4o_mini().model)
+    app_logger.info(f"Found {existing_experiments} existing experiments with {GPT_4o_mini().model}")
+    for _ in range(max(0, TARGET_EXPERIMENTS_PER_MODEL - existing_experiments)):
+        app_logger.info(f"Running experiment {_ + 1}/{TARGET_EXPERIMENTS_PER_MODEL - existing_experiments} for {GPT_4o_mini().model}")
         start_experiment(conf)
     
+    # GPT-4-1 experiments
     conf = ConversationConfig(
         participant_model_name=GPT_4_1().model,
         learner_model_name=GPT_4o().model,
         professor_model_name=GPT_4o().model,
-        )
-    
-    for _ in range(10):
+    )
+    existing_experiments = count_experiments_by_model(GPT_4_1().model)
+    app_logger.info(f"Found {existing_experiments} existing experiments with {GPT_4_1().model}")
+    for _ in range(max(0, TARGET_EXPERIMENTS_PER_MODEL - existing_experiments)):
+        app_logger.info(f"Running experiment {_ + 1}/{TARGET_EXPERIMENTS_PER_MODEL - existing_experiments} for {GPT_4_1().model}")
         start_experiment(conf)
 
+    # GPT-4-1-nano experiments
     conf = ConversationConfig(
         participant_model_name=GPT_4_1_nano().model,
         learner_model_name=GPT_4o().model,
         professor_model_name=GPT_4o().model,
-        )
-    
-    for _ in range(10):
+    )
+    existing_experiments = count_experiments_by_model(GPT_4_1_nano().model)
+    app_logger.info(f"Found {existing_experiments} existing experiments with {GPT_4_1_nano().model}")
+    for _ in range(max(0, TARGET_EXPERIMENTS_PER_MODEL - existing_experiments)):
+        app_logger.info(f"Running experiment {_ + 1}/{TARGET_EXPERIMENTS_PER_MODEL - existing_experiments} for {GPT_4_1_nano().model}")
         start_experiment(conf)

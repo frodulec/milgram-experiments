@@ -51,3 +51,6 @@ class ConversationDataModel(BaseModel):
         default_factory=lambda: int(datetime.datetime.now().timestamp()),
         description="Timestamp when the conversation was created."
         )
+    final_voltage: int = Field(
+        description="Final voltage of the experiment."
+    )
