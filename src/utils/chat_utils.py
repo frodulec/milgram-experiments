@@ -1,4 +1,5 @@
 from autogen import ChatResult
+from autogen.agentchat import AssistantAgent
 from models import Roles
 import json
 
@@ -7,6 +8,13 @@ def check_termination(message) -> bool:
     if message["content"]:
         return "goodbye" in message["content"].lower()
     return False
+
+
+def agents_total_cost(agents: list[AssistantAgent]) -> float:
+    total_cost = 0.0
+    for agent in agents:
+        total_cost += agent.get_actual_usage().get("total_cost", 0.0)
+    return total_cost
 
 
 def find_last_administered_shock(messages: list[dict]) -> int:
@@ -44,6 +52,7 @@ def convert_chat_history_to_json(
         Roles.PROFESSOR.value: "Professor",
         Roles.LEARNER.value: "Learner",
         Roles.PARTICIPANT.value: "Participant",
+        Roles.ORCHESTRATOR.value: "Orchestrator",
     }
     messages_of_people = [
         message
@@ -64,8 +73,8 @@ def convert_chat_history_to_json(
         for message in messages_of_people
     ]
 
-    # skip those containint "None"
-    data = [message for message in data if "None" not in message["text"]]
+    # # skip those containing "None"
+    # data = [message for message in data if "None" not in message["text"]]
     return data
 
 

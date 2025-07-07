@@ -14,19 +14,22 @@ class Roles(Enum):
     PROFESSOR = "Professor"
     PARTICIPANT = "Participant"
     LEARNER = "Learner"
+    ORCHESTRATOR = "Orchestrator"
 
 
 class ConversationConfig(BaseModel):
     max_rounds: int = Field(
-        default=300,
+        default=400,
         description="Maximum number of rounds in the conversation."
     )
-    participant_model_name: str = Field(
-        description="Name of the model used by the participant.")
-    learner_model_name: str = Field(
-        description="Name of the model used by the learner.")
-    professor_model_name: str = Field(
-        description="Name of the model used by the professor.")
+    participant_model: LLMConfig = Field(
+        description="LLM used by the participant agent.")
+    learner_model: LLMConfig = Field(
+        description="LLM used by the learner agent.")
+    professor_model: LLMConfig = Field(
+        description="LLM used by the professor agent.")
+    orchestrator_model: LLMConfig = Field(
+        description="LLM used by the orchestrator agent.")
 
 
 
