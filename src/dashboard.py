@@ -22,7 +22,7 @@ def load_experiments() -> List[Dict]:
         st.warning("Results directory not found. No experiments to display.")
         return []
     
-    # Iterate through all json files in the results directory
+    # Iterate through all json files in the results directory, without subfolders
     for filename in os.listdir("results"):
         if filename.startswith("experiment_") and filename.endswith(".json"):
             try:
@@ -75,12 +75,13 @@ def main():
             "Cost": exp.get("cost", 0),
             "Final Voltage": exp.get("final_voltage", 0),
             "Max Rounds": config.get("max_rounds", 0),
-            "Participant Model": config.get("participant_model_name", "Unknown"),
-            "Learner Model": config.get("learner_model_name", "Unknown"),
-            "Professor Model": config.get("professor_model_name", "Unknown"),
+            "Participant Model": config.get("participant_model", {}).get("model", "Unknown"),
+            "Learner Model": config.get("learner_model", {}).get("model", "Unknown"),
+            "Professor Model": config.get("professor_model", {}).get("model", "Unknown"),
             "Messages Count": len(exp.get("messages", [])),
             "Filename": exp.get("filename", "Unknown")
         })
+    
     
     df = pd.DataFrame(exp_data)
     

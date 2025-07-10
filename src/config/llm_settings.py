@@ -21,6 +21,7 @@ class GPT_4o(LLMConfig):
     model: str = "gpt-4o"
     api_key: str = os.environ["OPENAI_API_KEY"]
 
+
 class GPT_4o_mini(LLMConfig):
     model: str = "gpt-4o-mini"
     api_key: str = os.environ["OPENAI_API_KEY"]
@@ -29,28 +30,34 @@ class GPT_4o_mini(LLMConfig):
 class ClaudeSonnet4(LLMConfig):
     model: str = "claude-sonnet-4-20250514"
     api_key: str = os.environ["ANTHROPIC_API_KEY"]
+    api_type: str = "anthropic"
 
 
 class ClaudeHaiku(LLMConfig):
     model: str = "claude-3-5-haiku-20241022"
     api_key: str = os.environ["ANTHROPIC_API_KEY"]
+    api_type: str = "anthropic"
 
 
 class ClaudeSonnet3_7(LLMConfig):
-    model: str = "claude-3-7-sonnet-2025021"
+    model: str = "claude-3-7-sonnet-20250219"
     api_key: str = os.environ["ANTHROPIC_API_KEY"]
+    api_type: str = "anthropic"
 
 
-class Gemini2_5_Pro_preview(LLMConfig):
-    model: str = "gemini-2.5-pro-preview-06-05"
+class Gemini2_5Pro(LLMConfig):
+    model: str = "gemini-2.5-pro"
     api_key: str = os.environ["GOOGLE_API_KEY"]
+    api_type: str = "google"
 
 
-class Gemini2_5_Flash_preview(LLMConfig):
-    model: str = "gemini-2.5-flash-preview-05-20"
+class Gemini2_5Flash(LLMConfig):
+    model: str = "gemini-2.5-flash"
     api_key: str = os.environ["GOOGLE_API_KEY"]
+    api_type: str = "google"
 
 
-class Gemini2_0_Flash(LLMConfig):
-    model: str = "gemini-2.0-flash"
+class Gemini2_5FlashLite(LLMConfig):
+    model: str = "gemini-2.5-flash-lite-preview-06-17"
     api_key: str = os.environ["GOOGLE_API_KEY"]
+    api_type: str = "google"
