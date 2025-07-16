@@ -61,3 +61,15 @@ class Gemini2_5FlashLite(LLMConfig):
     model: str = "gemini-2.5-flash-lite-preview-06-17"
     api_key: str = os.environ["GOOGLE_API_KEY"]
     api_type: str = "google"
+
+
+class KimiK2(LLMConfig):
+    model: str = "moonshotai/kimi-k2"
+    api_key: str = os.environ["OPENROUTER_API_KEY"]
+    base_url: str = "https://openrouter.ai/api/v1"
+
+
+class Grok4(LLMConfig):
+    model: str = "x-ai/grok-4"
+    api_key: str = os.environ["OPENROUTER_API_KEY"]
+    base_url: str = "https://openrouter.ai/api/v1"

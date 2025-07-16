@@ -29,6 +29,8 @@ from config.llm_settings import (
     Gemini2_5Pro,
     Gemini2_5Flash,
     Gemini2_5FlashLite,
+    KimiK2,
+    Grok4,
     )
 from config.variables import VOLTAGE_CHANGE
 from models import Roles, ConversationDataModel, ConversationConfig
@@ -311,7 +313,7 @@ if __name__ == "__main__":
     ORCHESTRATOR = GPT_4o()
 
     # OpenAI
-    # run_model_experiments(GPT_4o(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
+    run_model_experiments(GPT_4o(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
     run_model_experiments(GPT_4o_mini(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
     run_model_experiments(GPT_4_1(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
     run_model_experiments(GPT_4_1_nano(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
@@ -322,6 +324,11 @@ if __name__ == "__main__":
     run_model_experiments(ClaudeHaiku(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
 
     # Gemini
-    run_model_experiments(Gemini2_5Pro(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
-    run_model_experiments(Gemini2_5Flash(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
     run_model_experiments(Gemini2_5FlashLite(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
+    run_model_experiments(Gemini2_5Flash(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
+    run_model_experiments(Gemini2_5Pro(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
+
+    # Openrouter
+    run_model_experiments(Grok4(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
+    # run_model_experiments(KimiK2(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
+

@@ -155,7 +155,7 @@ def main():
     selected_exp = st.selectbox(
         "Select experiment to view details",
         options=filtered_df["ID"].tolist(),
-        format_func=lambda x: f"{x} - {filtered_df[filtered_df['ID']==x]['Timestamp'].iloc[0]}"
+        format_func=lambda x: f"{x[:20]} - {filtered_df[filtered_df['ID']==x]['Timestamp'].iloc[0]} - {filtered_df[filtered_df['ID']==x]['Participant Model'].iloc[0]} - {filtered_df[filtered_df['ID']==x]['Final Voltage'].iloc[0]}"
     )
     
     if selected_exp:

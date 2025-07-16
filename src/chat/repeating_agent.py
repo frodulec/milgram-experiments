@@ -3,6 +3,7 @@ from typing import Optional, Any, Union, List
 import logging
 from autogen.oai.client import OpenAIWrapper
 from sentence_transformers import SentenceTransformer
+from time import sleep
 
 
 logger = logging.getLogger(__name__)
@@ -28,13 +29,12 @@ class RepeatingAgent(AssistantAgent):
     
     def generate_oai_reply(
         self,
-        # messages: Optional[list[dict[str, Any]]] = None,
-        # sender: Optional[Agent] = None,
-        # config: Optional[OpenAIWrapper] = None,
         *args,
         **kwargs,
     ) -> tuple[bool, Optional[Union[str, dict[str, Any]]]]:
         """Generate a reply using autogen.oai."""
+
+        # sleep(3)  # hotfix for gemini rates
         config = kwargs.get("config", None)
         sender = kwargs.get("sender", None)
         messages = kwargs.get("messages", None)
