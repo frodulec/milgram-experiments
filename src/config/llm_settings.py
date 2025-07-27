@@ -73,3 +73,9 @@ class Grok4(LLMConfig):
     model: str = "x-ai/grok-4"
     api_key: str = os.environ["OPENROUTER_API_KEY"]
     base_url: str = "https://openrouter.ai/api/v1"
+
+
+class Qwen3_235B_A22B_Instruct_2507(LLMConfig):
+    model: str = "qwen/qwen3-235b-a22b-2507"
+    api_key: str = os.environ["OPENROUTER_API_KEY"]
+    base_url: str = "https://openrouter.ai/api/v1"

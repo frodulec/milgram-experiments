@@ -31,6 +31,7 @@ from config.llm_settings import (
     Gemini2_5FlashLite,
     KimiK2,
     Grok4,
+    Qwen3_235B_A22B_Instruct_2507
     )
 from config.variables import VOLTAGE_CHANGE
 from models import Roles, ConversationDataModel, ConversationConfig
@@ -331,4 +332,5 @@ if __name__ == "__main__":
     # Openrouter
     run_model_experiments(Grok4(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
     # run_model_experiments(KimiK2(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
+    run_model_experiments(Qwen3_235B_A22B_Instruct_2507(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
 
