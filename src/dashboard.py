@@ -3,15 +3,27 @@ import json
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns  # Add seaborn import
 from typing import List, Dict
 import uuid
 import datetime
+import numpy as np
+from dashboard_charts import (
+    participant_model_violin_plot,
+    provider_comparison_plot,
+    plot_final_voltage_by_model,
+    provider_refusal_ratio_plot,
+    refusal_ratio_plot,
+    participant_model_provider_violin_plot,
+)
+from utils.general import get_provider_name
 
 st.set_page_config(
     page_title="Milgram Experiment Dashboard",
     page_icon="⚡",
     layout="wide"
 )
+
 
 def load_experiments() -> List[Dict]:
     """Load all experiment results from the results directory."""
@@ -84,28 +96,12 @@ def main():
     
     
     df = pd.DataFrame(exp_data)
+
+    # Add provider information to the dataframe
+    for i, row in df.iterrows():
+        df.at[i, "Provider"] = get_provider_name(row["Participant Model"])
     
-    # Visualizations
-    st.header("Experiment Visualizations")
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.subheader("Final Voltage Distribution")
-        fig, ax = plt.subplots(figsize=(10, 6))
-        df["Final Voltage"].hist(bins=15, ax=ax)
-        ax.set_xlabel("Voltage (V)")
-        ax.set_ylabel("Count")
-        st.pyplot(fig)
-    
-    with col2:
-        st.subheader("Cost vs. Messages Count")
-        fig, ax = plt.subplots(figsize=(10, 6))
-        ax.scatter(df["Messages Count"], df["Cost"])
-        ax.set_xlabel("Number of Messages")
-        ax.set_ylabel("Cost ($)")
-        st.pyplot(fig)
-    
+
     # Model comparison
     st.header("Model Comparison")
     model_groups = df.groupby("Participant Model")
@@ -117,7 +113,24 @@ def main():
     }).reset_index()
     
     st.dataframe(model_stats)
+
+
+   # Visualizations
+    st.header("Experiment Visualizations")
     
+    # Set a consistent theme for all seaborn plots
+    sns.set_theme(style="whitegrid")
+    
+
+    st.subheader("Final Voltage by Participant Model")
+    participant_model_violin_plot(df)
+    st.subheader("Final Voltage by Participant Model Provider")
+    participant_model_provider_violin_plot(df)
+    plot_final_voltage_by_model(df)
+    st.subheader("Final Voltage by Provider")
+    provider_comparison_plot(df)
+    st.subheader("Provider Refusal Ratio")
+    provider_refusal_ratio_plot(df)
     # Detailed experiment data
     st.header("All Experiments")
     
@@ -152,6 +165,14 @@ def main():
     
     # Experiment details
     st.header("Experiment Details")
+    # filter by mdoel name
+    model_filter = st.selectbox(
+        "Filter by Participant Model",
+        options=df["Participant Model"].unique(),
+        index=0
+    )
+    filtered_df = df[df["Participant Model"] == model_filter]
+
     selected_exp = st.selectbox(
         "Select experiment to view details",
         options=filtered_df["ID"].tolist(),
