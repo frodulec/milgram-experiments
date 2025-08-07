@@ -20,6 +20,7 @@ from instructions import (
 )
 
 from config.llm_settings import (
+    GPT_5,
     GPT_4o,
     GPT_4_1,
     GPT_4o_mini,
@@ -320,6 +321,7 @@ if __name__ == "__main__":
     run_model_experiments(GPT_4o_mini(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
     run_model_experiments(GPT_4_1(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
     run_model_experiments(GPT_4_1_nano(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
+    run_model_experiments(GPT_5(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
 
     # Claude
     run_model_experiments(ClaudeSonnet4(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)

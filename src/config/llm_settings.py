@@ -7,6 +7,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
+class GPT_5(LLMConfig):
+    model: str = "gpt-5"
+    api_key: str = os.environ["OPENAI_API_KEY"]
+    # provider_name: str = "OpenAI"
+
+
 class GPT_4_1(LLMConfig):
     model: str = "gpt-4.1-2025-04-14"
     api_key: str = os.environ["OPENAI_API_KEY"]
@@ -96,5 +102,11 @@ class Qwen3_235B_A22B_Instruct_2507(LLMConfig):
 
 class HorizonBeta(LLMConfig):
     model: str = "openrouter/horizon-beta"
+    api_key: str = os.environ["OPENROUTER_API_KEY"]
+    base_url: str = "https://openrouter.ai/api/v1"
+
+
+class HorizonBeta(LLMConfig):
+    model: str = "openai/gpt-oss-120b"
     api_key: str = os.environ["OPENROUTER_API_KEY"]
     base_url: str = "https://openrouter.ai/api/v1"
