@@ -58,6 +58,7 @@ class ClaudeSonnet3_7(LLMConfig):
     # provider_name: str = "Anthropic"
 
 
+
 class Gemini2_5Pro(LLMConfig):
     model: str = "gemini-2.5-pro"
     api_key: str = os.environ["GOOGLE_API_KEY"]
