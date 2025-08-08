@@ -1,3 +1,10 @@
+tts_cache/
+static
+results*
+.vscode
+
+*.mp3
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

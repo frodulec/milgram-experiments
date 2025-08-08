@@ -16,6 +16,8 @@ import base64
 from utils.chat_utils import load_conversation_dictionary
 from utils.drawing_utils import resize_sprite, adjust_cloud
 from utils.audio_utils import load_mp3
+from utils.general import get_provider_name, load_experiments
+
 import tempfile
 import os
 from run_experiment import start_experiment
@@ -176,6 +178,12 @@ async def generate_example_sequence(messages):
 
     yield f"data: {json.dumps({'type': 'end'})}\n\n"
 
+
+@app.get("/api/load-all-conversations")
+async def load_all_conversations():
+    conversations = load_experiments(skip_orchestrator=True)
+    
+    return conversations
 
 @app.get("/api/game-sequence-example")
 async def game_sequence_example():

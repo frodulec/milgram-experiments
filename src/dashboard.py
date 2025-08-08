@@ -20,7 +20,9 @@ from dashboard_charts import (
     heatmap_voltage_model_provider,
     ecdf_voltage_by_provider,
 )
-from utils.general import get_provider_name
+from utils.general import get_provider_name, load_experiments
+
+
 
 st.set_page_config(
     page_title="Milgram Experiment Dashboard",
@@ -29,27 +31,7 @@ st.set_page_config(
 )
 
 
-def load_experiments() -> List[Dict]:
-    """Load all experiment results from the results directory."""
-    experiments = []
-    
-    # Check if results directory exists
-    if not os.path.exists("results"):
-        st.warning("Results directory not found. No experiments to display.")
-        return []
-    
-    # Iterate through all json files in the results directory, without subfolders
-    for filename in os.listdir("results"):
-        if filename.startswith("experiment_") and filename.endswith(".json"):
-            try:
-                with open(os.path.join("results", filename), "r") as f:
-                    data = json.load(f)
-                    data["filename"] = filename  # Add filename for reference
-                    experiments.append(data)
-            except Exception as e:
-                st.error(f"Error reading file {filename}: {e}")
-    
-    return experiments
+
 
 def main():
     st.title("⚡ Milgram Experiment Dashboard")

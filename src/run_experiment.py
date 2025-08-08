@@ -15,7 +15,6 @@ from instructions import (
     INITIAL_MESSAGE,
     PROFESSOR_SYSTEM_MESSAGE,
     CHAT_MANAGER_SYSTEM_MESSAGE,
-    SPEAKER_SELECTOR_MESSAGE,
     ORCHESTRATOR_SYSTEM_MESSAGE
 )
 
@@ -311,8 +310,8 @@ if __name__ == "__main__":
     TARGET_EXPERIMENTS_PER_MODEL = 10
 
     # Define common models for learner, professor, orchestrator
-    LEARNER = GPT_4o()
-    PROFESSOR = GPT_4o()
+    LEARNER = Gemini2_5Flash()
+    PROFESSOR = Gemini2_5Flash()
     ORCHESTRATOR = GPT_4o()
 
     # OpenAI
