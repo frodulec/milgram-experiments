@@ -308,3 +308,107 @@ def provider_refusal_ratio_plot(df: pd.DataFrame) -> None:
     
     plt.tight_layout()
     st.pyplot(fig)
+
+def _ensure_provider(df: pd.DataFrame) -> pd.DataFrame:
+    if 'Provider' not in df.columns:
+        df = df.copy()
+        df['Provider'] = df['Participant Model'].apply(get_provider_name)
+    return df
+
+def ridge_voltage_by_provider(df: pd.DataFrame) -> None:
+    df = _ensure_provider(df)
+    order = (
+        df.groupby('Provider')['Final Voltage']
+        .mean()
+        .sort_values()
+        .index
+        .tolist()
+    )
+    g = sns.FacetGrid(
+        df, row='Provider', hue='Provider',
+        row_order=order, height=0.8, aspect=5,
+        sharex=True, sharey=False
+    )
+    g.map(sns.kdeplot, 'Final Voltage', fill=True, alpha=0.7, cut=0, bw_adjust=0.8)
+
+    for i, provider in enumerate(order):
+        ax = g.axes[i, 0]
+        sub = df[df['Provider'] == provider]['Final Voltage']
+        mean = sub.mean()
+        ax.axvline(mean, ls='--', lw=1, color='black')
+        ax.axvline(450, color='red', lw=1, alpha=0.4)
+        ax.text(0.01, 0.9, f"{provider}  (μ={mean:.1f}, n={len(sub)})",
+                transform=ax.transAxes, va='top', fontweight='bold')
+
+    g.set(xlabel="Final Voltage (V)", ylabel="")
+    g.fig.suptitle("Final Voltage Distributions by Provider", y=1.02)
+    st.pyplot(g.fig)
+
+def lollipop_mean_voltage(df: pd.DataFrame, group_by: str = "Provider", n_boot: int = 1000) -> None:
+    df = _ensure_provider(df)
+    grouped = df.groupby(group_by)['Final Voltage']
+
+    stats = grouped.agg(['mean', 'count']).reset_index()
+
+    def boot_ci(x):
+        boots = np.random.choice(x, size=(n_boot, len(x)), replace=True).mean(axis=1)
+        return np.percentile(boots, [2.5, 97.5])
+
+    cis = grouped.apply(boot_ci).to_list()
+    stats[['low', 'high']] = pd.DataFrame(cis, index=stats.index)
+    stats = stats.sort_values('mean')
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+    y = np.arange(len(stats))
+
+    ax.hlines(y=y, xmin=stats['low'], xmax=stats['high'], color='gray', alpha=0.6, lw=3)
+    ax.scatter(stats['mean'], y, s=80, color=sns.color_palette('deep')[0])
+
+    for i, (m, c) in enumerate(zip(stats['mean'], stats['count'])):
+        ax.text(m, i, f"  {m:.1f}V (n={c})", va='center')
+
+    ax.axvline(450, color='red', lw=1, alpha=0.4)
+    ax.set_yticks(y)
+    ax.set_yticklabels(stats[group_by])
+    ax.set_xlabel("Final Voltage (V)")
+    ax.set_title(f"Mean Final Voltage with 95% CI by {group_by}")
+    plt.tight_layout()
+    st.pyplot(fig)
+
+def heatmap_voltage_model_provider(df: pd.DataFrame) -> None:
+    df = _ensure_provider(df)
+    pivot = df.pivot_table(
+        index='Participant Model', columns='Provider',
+        values='Final Voltage', aggfunc='mean'
+    )
+    counts = df.pivot_table(
+        index='Participant Model', columns='Provider',
+        values='Final Voltage', aggfunc='count'
+    ).fillna(0).astype(int)
+
+    fig_w = max(8, 0.6 * pivot.shape[1] + 3)
+    fig_h = max(6, 0.5 * pivot.shape[0] + 2)
+
+    fig, ax = plt.subplots(figsize=(fig_w, fig_h))
+    annot = pivot.round(1).astype(str) + "\n(n=" + counts.astype(str) + ")"
+    sns.heatmap(
+        pivot, annot=annot, fmt="",
+        cmap='viridis', linewidths=0.4, linecolor='white',
+        cbar_kws={'label': 'Mean Final Voltage (V)'}, ax=ax
+    )
+    ax.set_xlabel("Provider")
+    ax.set_ylabel("Participant Model")
+    ax.set_title("Mean Final Voltage by Model and Provider")
+    plt.tight_layout()
+    st.pyplot(fig)
+
+def ecdf_voltage_by_provider(df: pd.DataFrame) -> None:
+    df = _ensure_provider(df)
+    fig, ax = plt.subplots(figsize=(10, 6))
+    sns.ecdfplot(data=df, x='Final Voltage', hue='Provider', ax=ax)
+    ax.axvline(450, color='red', lw=1, alpha=0.4)
+    ax.set_xlabel("Final Voltage (V)")
+    ax.set_title("ECDF of Final Voltage by Provider")
+    ax.legend(title="Provider", bbox_to_anchor=(1.01, 1), loc='upper left')
+    plt.tight_layout()
+    st.pyplot(fig)

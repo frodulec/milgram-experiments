@@ -20,7 +20,7 @@ from instructions import (
 )
 
 from config.llm_settings import (
-    GPT_5,
+    GPT5OpenRouter,
     GPT_4o,
     GPT_4_1,
     GPT_4o_mini,
@@ -34,7 +34,6 @@ from config.llm_settings import (
     KimiK2,
     Grok4,
     Qwen3_235B_A22B_Instruct_2507,
-    HorizonBeta,
     )
 from config.variables import VOLTAGE_CHANGE
 from models import Roles, ConversationDataModel, ConversationConfig
@@ -170,7 +169,7 @@ def start_experiment(config: ConversationConfig) -> None:
 
     manager = GroupChatManager(
         groupchat=group_chat,
-        llm_config=GPT_4o().model_dump(),
+        llm_config=GPT5OpenRouter().model_dump(),
         # system_message=CHAT_MANAGER_SYSTEM_MESSAGE,
     )
     chat = manager.initiate_chat(
@@ -321,7 +320,6 @@ if __name__ == "__main__":
     run_model_experiments(GPT_4o_mini(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
     run_model_experiments(GPT_4_1(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
     run_model_experiments(GPT_4_1_nano(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
-    run_model_experiments(GPT_5(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
 
     # Claude
     run_model_experiments(ClaudeSonnet4(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
@@ -337,5 +335,5 @@ if __name__ == "__main__":
     run_model_experiments(Grok4(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
     # run_model_experiments(KimiK2(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
     run_model_experiments(Qwen3_235B_A22B_Instruct_2507(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
-    run_model_experiments(HorizonBeta(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
+    run_model_experiments(GPT5OpenRouter(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
 

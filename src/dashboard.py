@@ -15,6 +15,10 @@ from dashboard_charts import (
     provider_refusal_ratio_plot,
     refusal_ratio_plot,
     participant_model_provider_violin_plot,
+    ridge_voltage_by_provider,
+    lollipop_mean_voltage,
+    heatmap_voltage_model_provider,
+    ecdf_voltage_by_provider,
 )
 from utils.general import get_provider_name
 
@@ -52,6 +56,7 @@ def main():
     
     # Load all experiments
     experiments = load_experiments()
+
     
     if not experiments:
         st.info("No experiment data found. Run some experiments first.")
@@ -97,6 +102,14 @@ def main():
     
     df = pd.DataFrame(exp_data)
 
+    # Filter by model
+    model_filter = st.multiselect(
+        "Filter by Participant Model",
+        options=df["Participant Model"].unique(),
+        default=df["Participant Model"].unique()
+    )
+    df = df[df["Participant Model"].isin(model_filter)]
+
     # Add provider information to the dataframe
     for i, row in df.iterrows():
         df.at[i, "Provider"] = get_provider_name(row["Participant Model"])
@@ -131,6 +144,19 @@ def main():
     provider_comparison_plot(df)
     st.subheader("Provider Refusal Ratio")
     provider_refusal_ratio_plot(df)
+
+    st.subheader("Ridge: Final Voltage Distributions by Provider")
+    ridge_voltage_by_provider(df)
+
+    st.subheader("Mean Final Voltage with 95% CI by Provider")
+    lollipop_mean_voltage(df, group_by="Provider")
+
+    st.subheader("Mean Final Voltage by Model × Provider")
+    heatmap_voltage_model_provider(df)
+
+    st.subheader("ECDF of Final Voltage by Provider")
+    ecdf_voltage_by_provider(df)
+    
     # Detailed experiment data
     st.header("All Experiments")
     

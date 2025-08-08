@@ -100,13 +100,8 @@ class Qwen3_235B_A22B_Instruct_2507(LLMConfig):
     # provider_name: str = "Alibaba" 
 
 
-class HorizonBeta(LLMConfig):
-    model: str = "openrouter/horizon-beta"
+class GPT5OpenRouter(LLMConfig):
+    model: str = "openai/gpt-5"
     api_key: str = os.environ["OPENROUTER_API_KEY"]
     base_url: str = "https://openrouter.ai/api/v1"
-
-
-class HorizonBeta(LLMConfig):
-    model: str = "openai/gpt-oss-120b"
-    api_key: str = os.environ["OPENROUTER_API_KEY"]
-    base_url: str = "https://openrouter.ai/api/v1"
+    # provider_name: str = "OpenAI via OpenRouter"

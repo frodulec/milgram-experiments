@@ -1,9 +1,7 @@
-from autogen import AssistantAgent, Agent, ConversableAgent
+from autogen import AssistantAgent, ConversableAgent
 from typing import Optional, Any, Union, List
 import logging
-from autogen.oai.client import OpenAIWrapper
 from sentence_transformers import SentenceTransformer
-from time import sleep
 
 
 logger = logging.getLogger(__name__)
@@ -15,7 +13,7 @@ class RepeatingAgent(AssistantAgent):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        
+
         # self.register_reply([Agent, None], ConversableAgent.check_termination_and_human_reply)
         # self.register_reply([Agent, None], self.generate_oai_reply, remove_other_reply_funcs=True)
         # self.register_reply([Agent, None], ConversableAgent.generate_oai_reply)
@@ -26,7 +24,6 @@ class RepeatingAgent(AssistantAgent):
             self.generate_oai_reply,
         )
 
-    
     def generate_oai_reply(
         self,
         *args,
@@ -43,27 +40,32 @@ class RepeatingAgent(AssistantAgent):
             return False, None
         if messages is None:
             messages = self._oai_messages[sender]
-        
+
         max_tries = 5
         for _ in range(max_tries):
             extracted_response = self._generate_oai_reply_from_client(
                 client, self._oai_system_message + messages, self.client_cache
-                )
+            )
             if self.check_message_if_valid(extracted_response):
                 return (True, extracted_response)
             else:
                 pass
-    
-        return (False, None) if extracted_response is None else (True, extracted_response)
+
+        return (
+            (False, None) if extracted_response is None else (True, extracted_response)
+        )
 
     def check_message_if_valid(self, message: str) -> bool:
-
         # check if contains any characters that are letters or numbers
         if not any(char.isalpha() or char.isdigit() for char in message):
             logger.info("Message does not contain any letters.")
             return False
         message_embedding = self.get_embedding(message)
-        similarity = float(self.embedding_model.similarity(message_embedding, self.get_wrong_message_embedding()))
+        similarity = float(
+            self.embedding_model.similarity(
+                message_embedding, self.get_wrong_message_embedding()
+            )
+        )
         logger.info(f"Agent refusal similarty: {similarity}")
 
         if similarity < 0.7:
@@ -77,5 +79,7 @@ class RepeatingAgent(AssistantAgent):
     def get_embedding(self, text: str) -> List[float]:
         """Get the embedding for a given prompt."""
 
-        query_embeddings = self.embedding_model.encode(text, prompt_name="query")
+        query_embeddings = self.embedding_model.encode(
+            text, prompt_name="query", show_progress_bar=False
+        )
         return query_embeddings

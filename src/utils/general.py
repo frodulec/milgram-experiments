@@ -12,7 +12,7 @@ def get_provider_name(model_name: str) -> str:
         The provider name as a string, or None if provider not found
     """
     model_name = model_name.lower()
-    if model_name.startswith("gpt-"):
+    if "gpt-" in model_name:
         return "OpenAI"
     elif model_name.startswith("claude-"):
         return "Anthropic"

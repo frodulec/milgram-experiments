@@ -105,15 +105,15 @@ The server will be available at `http://localhost:8000`
 1. **Single Experiment**
    ```python
    from src.run_experiment import start_experiment
-   from src.config.llm_settings import GPT_4o, ClaudeSonnet4
-   from src.models import ConversationConfig
-   
-   config = ConversationConfig(
-       participant_model=GPT_4o(),
-       learner_model=ClaudeSonnet4(),
-       professor_model=GPT_4o(),
-       orchestrator_model=GPT_4o()
-   )
+   from src.config.llm_settings import GPT5OpenRouter, ClaudeSonnet4
+from src.models import ConversationConfig
+
+config = ConversationConfig(
+    participant_model=GPT5OpenRouter(),
+    learner_model=ClaudeSonnet4(),
+    professor_model=GPT5OpenRouter(),
+    orchestrator_model=GPT5OpenRouter()
+)
    
    start_experiment(config)
    ```
@@ -121,16 +121,16 @@ The server will be available at `http://localhost:8000`
 2. **Batch Experiments**
    ```python
    from src.run_experiment import run_model_experiments
-   from src.config.llm_settings import GPT_4o, ClaudeSonnet4, Gemini2_5Pro
-   
-   # Run multiple experiments with different model combinations
-   run_model_experiments(
-       participant_model_instance=GPT_4o(),
-       target_experiments_per_model=10,
-       learner_model_instance=ClaudeSonnet4(),
-       professor_model_instance=GPT_4o(),
-       orchestrator_model_instance=Gemini2_5Pro()
-   )
+   from src.config.llm_settings import GPT5OpenRouter, ClaudeSonnet4, Gemini2_5Pro
+
+# Run multiple experiments with different model combinations
+run_model_experiments(
+    participant_model_instance=GPT5OpenRouter(),
+    target_experiments_per_model=10,
+    learner_model_instance=ClaudeSonnet4(),
+    professor_model_instance=GPT5OpenRouter(),
+    orchestrator_model_instance=Gemini2_5Pro()
+)
    ```
 
 #### Launch Dashboard
@@ -146,12 +146,8 @@ The dashboard will be available at `http://localhost:8501`
 
 The project supports multiple LLM providers and models:
 
-#### OpenAI Models
+#### OpenAI Models (via OpenRouter)
 - GPT-5
-- GPT-4.1
-- GPT-4.1-nano
-- GPT-4o
-- GPT-4o-mini
 
 #### Anthropic Models
 - Claude Sonnet 4
@@ -167,7 +163,6 @@ The project supports multiple LLM providers and models:
 - Kimi K2
 - Grok 4
 - Qwen 3.5 235B
-- Horizon Beta
 
 ### Experiment Configuration
 
@@ -176,10 +171,10 @@ from src.models import ConversationConfig
 
 config = ConversationConfig(
     max_rounds=400,  # Maximum conversation rounds
-    participant_model=GPT_4o(),
+    participant_model=GPT5OpenRouter(),
     learner_model=ClaudeSonnet4(),
-    professor_model=GPT_4o(),
-    orchestrator_model=GPT_4o()
+    professor_model=GPT5OpenRouter(),
+    orchestrator_model=GPT5OpenRouter()
 )
 ```
 
