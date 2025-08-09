@@ -67,13 +67,14 @@ class ToolVerificationAgent(AssistantAgent):
                 client, self._oai_system_message + messages, self.client_cache
             )
             if "tool_calls" in extracted_response:
-                detected_id = extracted_response["tool_calls"][0]["id"]
-                if len(detected_id) > 40:
-                    # somtimes comes as 'chatcmpl-tool-...'
-                    # for example chatcmpl-tool-880b2192a3034e4f81183bcf32cc9149
-                    # which is too long for the tool call id
-                    logger.warning(f"Detected tool call with wrong id: {detected_id}")
-                    continue
+                if extracted_response["tool_calls"] is not None:
+                    detected_id = extracted_response["tool_calls"][0]["id"]
+                    if len(detected_id) > 40:
+                        # somtimes comes as 'chatcmpl-tool-...'
+                        # for example chatcmpl-tool-880b2192a3034e4f81183bcf32cc9149
+                        # which is too long for the tool call id
+                        logger.warning(f"Detected tool call with wrong id: {detected_id}")
+                        continue
 
             return (
                 (False, None)
