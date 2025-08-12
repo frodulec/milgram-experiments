@@ -88,6 +88,7 @@ class ToolVerificationAgent(AssistantAgent):
                     else (True, extracted_response)
                 )
             except GoogleClientError as e:
+                # TODO add proper rate limit handling etc.
                 details = e.details["error"]["details"]
                 retry_delay = None
                 for detail in details:
