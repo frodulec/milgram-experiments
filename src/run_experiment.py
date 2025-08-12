@@ -15,11 +15,12 @@ from instructions import (
     INITIAL_MESSAGE,
     PROFESSOR_SYSTEM_MESSAGE,
     CHAT_MANAGER_SYSTEM_MESSAGE,
-    ORCHESTRATOR_SYSTEM_MESSAGE
+    ORCHESTRATOR_SYSTEM_MESSAGE,
 )
 
 from config.llm_settings import (
     GPT5OpenRouter,
+    GPT5MiniOpenRouter,
     GPT_4o,
     GPT_4_1,
     GPT_4o_mini,
@@ -33,7 +34,7 @@ from config.llm_settings import (
     KimiK2,
     Grok4,
     Qwen3_235B_A22B_Instruct_2507,
-    )
+)
 from config.variables import VOLTAGE_CHANGE
 from models import Roles, ConversationDataModel, ConversationConfig
 import uuid
@@ -42,7 +43,7 @@ from utils.chat_utils import (
     convert_chat_history_to_json,
     check_termination,
     check_if_administered_shock,
-    agents_total_cost
+    agents_total_cost,
 )
 import logging
 
@@ -64,25 +65,23 @@ app_logger.setLevel(logging.INFO)
 load_dotenv()
 
 
-
 def dump_to_json(data: dict, output_file_path: str) -> None:
     with open(output_file_path, "w") as f:
         json.dump(data, f, indent=4)
 
 
 def start_experiment(config: ConversationConfig) -> None:
-    
     CURRENT_VOLTAGE = 0
 
-    def press_button(learner_answered_incorrectly: bool, learner_was_asked_question: bool):
+    def press_button(
+        learner_answered_incorrectly: bool, learner_was_asked_question: bool
+    ):
         """
         Press the button to increase voltage.
         Should be called only after the Learner has been asked a question and answered the question.
         Raises the current voltage by <VOLTAGE_CHANGE> volts."""
         if not learner_was_asked_question:
-            return (
-                "NARRATOR_MESSAGE: Learner was not asked a question. Cannot press button."
-            )
+            return "NARRATOR_MESSAGE: Learner was not asked a question. Cannot press button."
         if learner_answered_incorrectly:
             nonlocal CURRENT_VOLTAGE
             CURRENT_VOLTAGE += VOLTAGE_CHANGE
@@ -96,7 +95,7 @@ def start_experiment(config: ConversationConfig) -> None:
         llm_config=config.participant_model.model_dump(),
         system_message=PARTICIPANT_SYSTEM_MESSAGE,
         is_termination_msg=check_termination,
-        max_consecutive_auto_reply=config.max_rounds
+        max_consecutive_auto_reply=config.max_rounds,
     )
 
     learner = RepeatingAgent(
@@ -104,8 +103,7 @@ def start_experiment(config: ConversationConfig) -> None:
         llm_config=config.learner_model.model_dump(),
         system_message=LEARNER_SYSTEM_MESSAGE,
         is_termination_msg=check_termination,
-        max_consecutive_auto_reply=config.max_rounds
-
+        max_consecutive_auto_reply=config.max_rounds,
     )
 
     proffesor = ProfessorAgent(
@@ -113,7 +111,7 @@ def start_experiment(config: ConversationConfig) -> None:
         llm_config=config.professor_model.model_dump(),
         system_message=PROFESSOR_SYSTEM_MESSAGE,
         is_termination_msg=check_termination,
-        max_consecutive_auto_reply=config.max_rounds
+        max_consecutive_auto_reply=config.max_rounds,
     )
 
     orchestrator = RepeatingAgent(
@@ -121,8 +119,9 @@ def start_experiment(config: ConversationConfig) -> None:
         llm_config=config.orchestrator_model.model_dump(),
         system_message=ORCHESTRATOR_SYSTEM_MESSAGE,
         is_termination_msg=check_termination,
-        max_consecutive_auto_reply=config.max_rounds
+        max_consecutive_auto_reply=config.max_rounds,
     )
+
     def group_chat_order(last_agent: AssistantAgent, chat: GroupChat):
         """
         This function selects the next speaker based on the last agent's role.
@@ -153,12 +152,7 @@ def start_experiment(config: ConversationConfig) -> None:
     )(press_button)
 
     group_chat = GroupChat(
-        agents=[
-            proffesor,
-            learner,
-            participant,
-            orchestrator
-        ],
+        agents=[proffesor, learner, participant, orchestrator],
         messages=[],
         max_round=config.max_rounds,
         speaker_selection_method=group_chat_order,
@@ -185,7 +179,7 @@ def start_experiment(config: ConversationConfig) -> None:
         config=config,
         cost=cost,
         final_voltage=CURRENT_VOLTAGE,
-        )
+    )
 
     dump_to_json(conv.model_dump(), f"results/experiment_{conv.id}.json")
     app_logger.info("Experiment completed successfully.")
@@ -194,20 +188,20 @@ def start_experiment(config: ConversationConfig) -> None:
 def count_experiments_by_model(participant_model_name: str) -> int:
     """
     Counts the number of existing experiment files for a specific participant model.
-    
+
     Args:
         participant_model_name: The name of the participant model to count experiments for
-        
+
     Returns:
         int: The count of experiment files with the specified participant model
     """
     count = 0
-    
+
     # Check if results directory exists
     if not os.path.exists("results"):
         app_logger.warning("Results directory not found")
         return 0
-        
+
     # Iterate through all json files in the results directory
     for filename in os.listdir("results"):
         if filename.startswith("experiment_") and filename.endswith(".json"):
@@ -215,11 +209,14 @@ def count_experiments_by_model(participant_model_name: str) -> int:
                 with open(os.path.join("results", filename), "r") as f:
                     data = json.load(f)
                     # Check if the participant model matches the requested one
-                    if data.get("config", {}).get("participant_model").get("model") == participant_model_name:
+                    if (
+                        data.get("config", {}).get("participant_model").get("model")
+                        == participant_model_name
+                    ):
                         count += 1
             except Exception as e:
                 app_logger.error(f"Error reading file {filename}: {e}")
-                
+
     return count
 
 
@@ -251,7 +248,7 @@ def verify_experiment():
                 shock_index = order_of_conversation.index("SHOCKING_DEVICE")
             else:
                 shock_index = None
-            
+
             if shock_index is not None and learner_answer_index is not None:
                 if shock_index < learner_answer_index:
                     errors_count += 1
@@ -264,16 +261,16 @@ def verify_experiment():
                     errors_count += 1
                 else:
                     app_logger.info(f"Experiment {experiment_id} passed")
-    
+
     app_logger.info(f"Total errors: {errors_count} out of {tries_count}")
-    
+
 
 def run_model_experiments(
     participant_model_instance,
     target_experiments_per_model,
     learner_model_instance,
     professor_model_instance,
-    orchestrator_model_instance
+    orchestrator_model_instance,
 ):
     """
     Runs a series of experiments for a given participant model.
@@ -292,14 +289,20 @@ def run_model_experiments(
         orchestrator_model=orchestrator_model_instance,
     )
     existing_experiments = count_experiments_by_model(participant_model_instance.model)
-    app_logger.info(f"Found {existing_experiments} existing experiments with {participant_model_instance.model}")
+    app_logger.info(
+        f"Found {existing_experiments} existing experiments with {participant_model_instance.model}"
+    )
 
     experiments_to_run = max(0, target_experiments_per_model - existing_experiments)
     for i in range(experiments_to_run):
-        app_logger.info(f"Running experiment {i + 1}/{experiments_to_run} for {participant_model_instance.model}")
+        app_logger.info(
+            f"Running experiment {i + 1}/{experiments_to_run} for {participant_model_instance.model}"
+        )
         start_experiment(conf)
 
-    logger.info(f"Number of {participant_model_instance.model} experiments: {count_experiments_by_model(participant_model_instance.model)}")
+    logger.info(
+        f"Number of {participant_model_instance.model} experiments: {count_experiments_by_model(participant_model_instance.model)}"
+    )
 
 
 if __name__ == "__main__":
@@ -315,24 +318,64 @@ if __name__ == "__main__":
     ORCHESTRATOR = GPT_4o()
 
     # OpenAI
-    run_model_experiments(GPT_4o(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
-    run_model_experiments(GPT_4o_mini(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
-    run_model_experiments(GPT_4_1(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
+    run_model_experiments(
+        GPT_4o(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR
+    )
+    run_model_experiments(
+        GPT_4o_mini(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR
+    )
+    run_model_experiments(
+        GPT_4_1(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR
+    )
     # run_model_experiments(GPT_4_1_nano(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
 
     # Claude
-    run_model_experiments(ClaudeSonnet4(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
-    run_model_experiments(ClaudeSonnet3_7(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
+    run_model_experiments(
+        ClaudeSonnet4(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR
+    )
+    run_model_experiments(
+        ClaudeSonnet3_7(),
+        TARGET_EXPERIMENTS_PER_MODEL,
+        LEARNER,
+        PROFESSOR,
+        ORCHESTRATOR,
+    )
     # run_model_experiments(ClaudeHaiku(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
 
     # Gemini
-    run_model_experiments(Gemini2_5FlashLite(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
-    run_model_experiments(Gemini2_5Flash(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
-    run_model_experiments(Gemini2_5Pro(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
+    run_model_experiments(
+        Gemini2_5FlashLite(),
+        TARGET_EXPERIMENTS_PER_MODEL,
+        LEARNER,
+        PROFESSOR,
+        ORCHESTRATOR,
+    )
+    run_model_experiments(
+        Gemini2_5Flash(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR
+    )
+    run_model_experiments(
+        Gemini2_5Pro(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR
+    )
 
     # Openrouter
-    run_model_experiments(Grok4(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
+    run_model_experiments(
+        Grok4(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR
+    )
     # run_model_experiments(KimiK2(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
-    run_model_experiments(Qwen3_235B_A22B_Instruct_2507(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
-    run_model_experiments(GPT5OpenRouter(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
-
+    run_model_experiments(
+        Qwen3_235B_A22B_Instruct_2507(),
+        TARGET_EXPERIMENTS_PER_MODEL,
+        LEARNER,
+        PROFESSOR,
+        ORCHESTRATOR,
+    )
+    run_model_experiments(
+        GPT5OpenRouter(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR
+    )
+    run_model_experiments(
+        GPT5MiniOpenRouter(),
+        TARGET_EXPERIMENTS_PER_MODEL,
+        LEARNER,
+        PROFESSOR,
+        ORCHESTRATOR,
+    )

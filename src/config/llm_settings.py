@@ -3,7 +3,6 @@ import os
 from dotenv import load_dotenv
 
 
-
 load_dotenv()
 
 
@@ -58,7 +57,6 @@ class ClaudeSonnet3_7(LLMConfig):
     # provider_name: str = "Anthropic"
 
 
-
 class Gemini2_5Pro(LLMConfig):
     model: str = "gemini-2.5-pro"
     api_key: str = os.environ["GOOGLE_API_KEY"]
@@ -98,11 +96,18 @@ class Qwen3_235B_A22B_Instruct_2507(LLMConfig):
     model: str = "qwen/qwen3-235b-a22b-2507"
     api_key: str = os.environ["OPENROUTER_API_KEY"]
     base_url: str = "https://openrouter.ai/api/v1"
-    # provider_name: str = "Alibaba" 
+    # provider_name: str = "Alibaba"
 
 
 class GPT5OpenRouter(LLMConfig):
     model: str = "openai/gpt-5"
+    api_key: str = os.environ["OPENROUTER_API_KEY"]
+    base_url: str = "https://openrouter.ai/api/v1"
+    # provider_name: str = "OpenAI via OpenRouter"
+
+
+class GPT5MiniOpenRouter(LLMConfig):
+    model: str = "openai/gpt-5-mini"
     api_key: str = os.environ["OPENROUTER_API_KEY"]
     base_url: str = "https://openrouter.ai/api/v1"
     # provider_name: str = "OpenAI via OpenRouter"

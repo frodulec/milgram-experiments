@@ -1,6 +1,9 @@
 from autogen import AssistantAgent, ConversableAgent
 from typing import Optional, Any, Union
 import logging
+import json
+import time
+from google.genai.errors import ClientError as GoogleClientError
 
 
 logger = logging.getLogger(__name__)
@@ -63,23 +66,40 @@ class ToolVerificationAgent(AssistantAgent):
 
         tries_count = 5
         for _ in range(tries_count):
-            extracted_response = self._generate_oai_reply_from_client(
-                client, self._oai_system_message + messages, self.client_cache
-            )
-            if "tool_calls" in extracted_response:
-                if extracted_response["tool_calls"] is not None:
-                    detected_id = extracted_response["tool_calls"][0]["id"]
-                    if len(detected_id) > 40:
-                        # somtimes comes as 'chatcmpl-tool-...'
-                        # for example chatcmpl-tool-880b2192a3034e4f81183bcf32cc9149
-                        # which is too long for the tool call id
-                        logger.warning(f"Detected tool call with wrong id: {detected_id}")
-                        continue
+            try:
+                extracted_response = self._generate_oai_reply_from_client(
+                    client, self._oai_system_message + messages, self.client_cache
+                )
+                if "tool_calls" in extracted_response:
+                    if extracted_response["tool_calls"] is not None:
+                        detected_id = extracted_response["tool_calls"][0]["id"]
+                        if len(detected_id) > 40:
+                            # somtimes comes as 'chatcmpl-tool-...'
+                            # for example chatcmpl-tool-880b2192a3034e4f81183bcf32cc9149
+                            # which is too long for the tool call id
+                            logger.warning(
+                                f"Detected tool call with wrong id: {detected_id}"
+                            )
+                            continue
 
-            return (
-                (False, None)
-                if extracted_response is None
-                else (True, extracted_response)
-            )
+                return (
+                    (False, None)
+                    if extracted_response is None
+                    else (True, extracted_response)
+                )
+            except GoogleClientError as e:
+                details = e.details["error"]["details"]
+                retry_delay = None
+                for detail in details:
+                    if detail["@type"] == "type.googleapis.com/google.rpc.RetryInfo":
+                        retry_delay = float(detail["retryDelay"].replace("s", ""))
+                        break
+                if retry_delay is not None:
+                    logger.warning(f"Retrying after {retry_delay} seconds")
+                    time.sleep(retry_delay)
+
+            except Exception as e:
+                logger.warning(f"Error in _generate_oai_reply: {e}")
+                continue
 
         raise ValueError("Failed to generate a valid response after multiple attempts.")
