@@ -38,19 +38,19 @@ def get_provider_name(model_name: str) -> str:
     return "Unknown"
 
 
-def load_experiments(skip_orchestrator: bool = False) -> List[Dict]:
+def load_experiments(skip_orchestrator: bool = False, folder: str = "results") -> List[Dict]:
     """Load all experiment results from the results directory."""
     experiments = []
     
     # Check if results directory exists
-    if not os.path.exists("results"):
+    if not os.path.exists(folder):
         return []
     
     # Iterate through all json files in the results directory, without subfolders
-    for filename in os.listdir("results"):
+    for filename in os.listdir(folder):
         if filename.startswith("experiment_") and filename.endswith(".json"):
             try:
-                with open(os.path.join("results", filename), "r") as f:
+                with open(os.path.join(folder, filename), "r") as f:
                     data = json.load(f)
                     data["filename"] = filename  # Add filename for reference
                     data["messages"] = [msg for msg in data["messages"] if msg["speaker"] != "Orchestrator"] if skip_orchestrator else data["messages"]
@@ -58,4 +58,5 @@ def load_experiments(skip_orchestrator: bool = False) -> List[Dict]:
             except Exception as e:
                 logger.error(f"Error reading file {filename}: {e}")
     
+    logger.info(f"Loaded {len(experiments)} experiments")
     return experiments

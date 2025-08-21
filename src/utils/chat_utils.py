@@ -13,7 +13,9 @@ def check_termination(message) -> bool:
 def agents_total_cost(agents: list[AssistantAgent]) -> float:
     total_cost = 0.0
     for agent in agents:
-        total_cost += agent.get_actual_usage().get("total_cost", 0.0)
+        actual_usage = agent.get_actual_usage()
+        if actual_usage:
+            total_cost += agent.get_actual_usage().get("total_cost", 0.0)
     return total_cost
 
 
@@ -58,7 +60,7 @@ def convert_chat_history_to_json(
         message
         for message in chat.chat_history
         if message["name"] in agent_names_mapping
-        and message["content"] != ""
+        and (message["content"] != "" or len(message.get("tool_calls", [])) > 0)
         and "NARRATOR_MESSAGE" not in message["content"]
     ]
     data = [

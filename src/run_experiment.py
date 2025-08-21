@@ -66,6 +66,10 @@ load_dotenv()
 
 
 def dump_to_json(data: dict, output_file_path: str) -> None:
+
+    dir_path = os.path.dirname(output_file_path)
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
     with open(output_file_path, "w") as f:
         json.dump(data, f, indent=4)
 
@@ -182,6 +186,15 @@ def start_experiment(config: ConversationConfig) -> None:
     )
 
     dump_to_json(conv.model_dump(), f"results/experiment_{conv.id}.json")
+
+    # also save raw chat history
+    raw_conv = ConversationDataModel(
+        messages=chat.chat_history,
+        config=config,
+        cost=cost,
+        final_voltage=CURRENT_VOLTAGE,
+    )
+    dump_to_json(raw_conv.model_dump(), f"raw_results/experiment_{conv.id}_raw.json")
     app_logger.info("Experiment completed successfully.")
 
 
@@ -327,7 +340,6 @@ if __name__ == "__main__":
     run_model_experiments(
         GPT_4_1(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR
     )
-    # run_model_experiments(GPT_4_1_nano(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
 
     # Claude
     run_model_experiments(
@@ -340,7 +352,6 @@ if __name__ == "__main__":
         PROFESSOR,
         ORCHESTRATOR,
     )
-    # run_model_experiments(ClaudeHaiku(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
 
     # Gemini
     run_model_experiments(
@@ -361,7 +372,6 @@ if __name__ == "__main__":
     run_model_experiments(
         Grok4(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR
     )
-    # run_model_experiments(KimiK2(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR)
     run_model_experiments(
         Qwen3_235B_A22B_Instruct_2507(),
         TARGET_EXPERIMENTS_PER_MODEL,

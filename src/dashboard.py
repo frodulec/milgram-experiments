@@ -38,7 +38,9 @@ def main():
     
     # Load all experiments
     experiments = load_experiments()
+    old_experiments = load_experiments(folder="results_19.08.2025")
 
+    experiments.extend(old_experiments)
     
     if not experiments:
         st.info("No experiment data found. Run some experiments first.")
@@ -109,35 +111,36 @@ def main():
     
     st.dataframe(model_stats)
 
+    _, mid_section, _ = st.columns([1, 2, 1])
+    with mid_section:
+    # Visualizations
+        st.header("Experiment Visualizations")
+        
+        # Set a consistent theme for all seaborn plots
+        sns.set_theme(style="whitegrid")
+        
 
-   # Visualizations
-    st.header("Experiment Visualizations")
-    
-    # Set a consistent theme for all seaborn plots
-    sns.set_theme(style="whitegrid")
-    
+        st.subheader("Final Voltage by Participant Model")
+        participant_model_violin_plot(df)
+        st.subheader("Final Voltage by Participant Model Provider")
+        participant_model_provider_violin_plot(df)
+        plot_final_voltage_by_model(df)
+        st.subheader("Final Voltage by Provider")
+        provider_comparison_plot(df)
+        st.subheader("Provider Refusal Ratio")
+        provider_refusal_ratio_plot(df)
 
-    st.subheader("Final Voltage by Participant Model")
-    participant_model_violin_plot(df)
-    st.subheader("Final Voltage by Participant Model Provider")
-    participant_model_provider_violin_plot(df)
-    plot_final_voltage_by_model(df)
-    st.subheader("Final Voltage by Provider")
-    provider_comparison_plot(df)
-    st.subheader("Provider Refusal Ratio")
-    provider_refusal_ratio_plot(df)
+        # st.subheader("Ridge: Final Voltage Distributions by Provider")
+        # ridge_voltage_by_provider(df)
 
-    st.subheader("Ridge: Final Voltage Distributions by Provider")
-    ridge_voltage_by_provider(df)
+        # st.subheader("Mean Final Voltage with 95% CI by Provider")
+        # lollipop_mean_voltage(df, group_by="Provider")
 
-    st.subheader("Mean Final Voltage with 95% CI by Provider")
-    lollipop_mean_voltage(df, group_by="Provider")
+        # st.subheader("Mean Final Voltage by Model × Provider")
+        # heatmap_voltage_model_provider(df)
 
-    st.subheader("Mean Final Voltage by Model × Provider")
-    heatmap_voltage_model_provider(df)
-
-    st.subheader("ECDF of Final Voltage by Provider")
-    ecdf_voltage_by_provider(df)
+        # st.subheader("ECDF of Final Voltage by Provider")
+        # ecdf_voltage_by_provider(df)
     
     # Detailed experiment data
     st.header("All Experiments")
@@ -173,13 +176,6 @@ def main():
     
     # Experiment details
     st.header("Experiment Details")
-    # filter by mdoel name
-    model_filter = st.selectbox(
-        "Filter by Participant Model",
-        options=df["Participant Model"].unique(),
-        index=0
-    )
-    filtered_df = df[df["Participant Model"] == model_filter]
 
     selected_exp = st.selectbox(
         "Select experiment to view details",
@@ -211,6 +207,10 @@ def main():
                 st.markdown(f"**⚡ SHOCK ⚡**: {text}")
             else:
                 st.markdown(f"**{speaker}**: {text}")
+        
+        if st.button("Delete Experiment"):
+            os.remove(os.path.join("results", exp_file))
+            st.rerun()
 
 if __name__ == "__main__":
     main()

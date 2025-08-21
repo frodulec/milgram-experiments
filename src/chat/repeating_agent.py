@@ -3,6 +3,7 @@ from typing import Optional, Any, Union, List
 import logging
 from sentence_transformers import SentenceTransformer
 
+from functools import lru_cache
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -43,13 +44,24 @@ class RepeatingAgent(AssistantAgent):
 
         max_tries = 5
         for _ in range(max_tries):
-            extracted_response = self._generate_oai_reply_from_client(
-                client, self._oai_system_message + messages, self.client_cache
-            )
-            if self.check_message_if_valid(extracted_response):
-                return (True, extracted_response)
+            try:
+                extracted_response = self._generate_oai_reply_from_client(
+                    client, self._oai_system_message + messages, self.client_cache
+                )
+            except Exception as e:
+                logger.error(f"Error generating response: {e}")
+                continue
+            if isinstance(extracted_response, str):
+                # check if message
+                if self.check_message_if_valid(extracted_response):
+                    return (True, extracted_response)
             else:
-                pass
+                if isinstance(extracted_response, dict):
+                   if self.check_message_if_valid(extracted_response["content"]):
+                       return (True, extracted_response)
+                else:
+                    raise ValueError("Invalid response type")
+
 
         return (
             (False, None) if extracted_response is None else (True, extracted_response)
@@ -72,6 +84,7 @@ class RepeatingAgent(AssistantAgent):
             return True
         return False
 
+    @lru_cache
     def get_wrong_message_embedding(self) -> List[float]:
         incorrent_message = "Sorry, I can't assist with that."
         return self.get_embedding(incorrent_message)
@@ -82,4 +95,4 @@ class RepeatingAgent(AssistantAgent):
         query_embeddings = self.embedding_model.encode(
             text, prompt_name="query", show_progress_bar=False
         )
-        return query_embeddings
+        return query_embeddings.tolist()
