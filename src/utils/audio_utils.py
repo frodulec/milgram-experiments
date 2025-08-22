@@ -18,6 +18,9 @@ def load_mp3(filename: str) -> BytesIO:
         return BytesIO(out) # Wrap the bytes in BytesIO
     except ffmpeg.Error as e:
         raise RuntimeError(f"Error loading MP3 file: {e.stderr.decode()}") from e
+    except Exception as e:
+        # Handle other potential exceptions from ffmpeg-python
+        raise RuntimeError(f"Error loading MP3 file: {str(e)}") from e
 
 if __name__ == "__main__":
     load_mp3("static/electric-shock-cut.mp3")
