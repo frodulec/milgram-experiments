@@ -48,7 +48,7 @@ def check_if_administered_shock(message: dict) -> bool:
     )
 
 def convert_chat_history_to_json(
-    chat: ChatResult
+    chat_history: dict
 ) -> list[dict]:
     agent_names_mapping = {
         Roles.PROFESSOR.value: "Professor",
@@ -58,7 +58,7 @@ def convert_chat_history_to_json(
     }
     messages_of_people = [
         message
-        for message in chat.chat_history
+        for message in chat_history
         if message["name"] in agent_names_mapping
         and (message["content"] != "" or len(message.get("tool_calls", [])) > 0)
         and "NARRATOR_MESSAGE" not in message["content"]

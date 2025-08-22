@@ -8,6 +8,16 @@ from typing import List, Dict
 logger = logging.getLogger(__name__)
 
 
+
+def remove_api_keys_from_json(data: dict) -> dict:
+    # TODO refactor this 
+    data["config"]["participant_model"].pop("api_key", None)
+    data["config"]["learner_model"].pop("api_key", None)
+    data["config"]["professor_model"].pop("api_key", None)
+    data["config"]["orchestrator_model"].pop("api_key", None)
+    return data
+
+
 def get_provider_name(model_name: str) -> str:
     """
     Returns the provider name for a given model configuration.

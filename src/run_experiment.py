@@ -45,6 +45,7 @@ from utils.chat_utils import (
     check_if_administered_shock,
     agents_total_cost,
 )
+from utils.general import remove_api_keys_from_json
 import logging
 
 
@@ -65,7 +66,10 @@ app_logger.setLevel(logging.INFO)
 load_dotenv()
 
 
+
 def dump_to_json(data: dict, output_file_path: str) -> None:
+
+    data = remove_api_keys_from_json(data)
 
     dir_path = os.path.dirname(output_file_path)
     if not os.path.exists(dir_path):
@@ -176,7 +180,7 @@ def start_experiment(config: ConversationConfig) -> None:
 
     cost: float = agents_total_cost([proffesor, learner, participant, orchestrator])
     app_logger.info(f"Total cost: {cost}")
-    messages = convert_chat_history_to_json(chat)
+    messages = convert_chat_history_to_json(chat.chat_history)
 
     conv = ConversationDataModel(
         messages=messages,

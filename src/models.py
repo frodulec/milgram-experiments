@@ -3,11 +3,12 @@ from pydantic import BaseModel, Field
 from typing import List, Dict
 import uuid
 import datetime
+from utils.general import remove_api_keys_from_json
 
 
 class LLMConfig(BaseModel):
     model: str
-    api_key: str
+    api_key: str | None = None
 
 
 class Roles(Enum):
@@ -32,9 +33,6 @@ class ConversationConfig(BaseModel):
         description="LLM used by the orchestrator agent.")
 
 
-
-
-
 class ConversationDataModel(BaseModel):
     id: str = Field(
         default_factory=lambda: str(uuid.uuid4()),
@@ -57,3 +55,7 @@ class ConversationDataModel(BaseModel):
     final_voltage: int = Field(
         description="Final voltage of the experiment."
     )
+
+    def model_dump(self):
+        """Removes the api keys from inner ConversationConfig"""
+        return remove_api_keys_from_json(super().model_dump())
