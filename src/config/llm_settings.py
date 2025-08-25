@@ -111,3 +111,9 @@ class GPT5MiniOpenRouter(LLMConfig):
     api_key: str = os.environ["OPENROUTER_API_KEY"]
     base_url: str = "https://openrouter.ai/api/v1"
     # provider_name: str = "OpenAI via OpenRouter"
+
+
+class DeepSeek_3_1(LLMConfig):
+    model: str = "deepseek/deepseek-chat-v3.1"
+    api_key: str = os.environ["OPENROUTER_API_KEY"]
+    base_url: str = "https://openrouter.ai/api/v1"

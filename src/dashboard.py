@@ -38,8 +38,8 @@ def main():
     
     # Load all experiments
     experiments = load_experiments()
-    old_experiments = load_experiments(folder="results_19.08.2025")
 
+    old_experiments = load_experiments(folder="results_19.08.2025")
     experiments.extend(old_experiments)
     
     if not experiments:
@@ -98,6 +98,8 @@ def main():
     for i, row in df.iterrows():
         df.at[i, "Provider"] = get_provider_name(row["Participant Model"])
     
+    # if model contains also provider, for example openai/gpt-5, leave only the model
+    df['Participant Model'] = df['Participant Model'].apply(lambda x: x.split('/')[-1])
 
     # Model comparison
     st.header("Model Comparison")
@@ -124,9 +126,9 @@ def main():
         participant_model_violin_plot(df)
         st.subheader("Final Voltage by Participant Model Provider")
         participant_model_provider_violin_plot(df)
-        plot_final_voltage_by_model(df)
-        st.subheader("Final Voltage by Provider")
-        provider_comparison_plot(df)
+        # plot_final_voltage_by_model(df)
+        # st.subheader("Final Voltage by Provider")
+        # provider_comparison_plot(df)
         st.subheader("Provider Refusal Ratio")
         provider_refusal_ratio_plot(df)
 
@@ -186,9 +188,15 @@ def main():
     if selected_exp:
         # Find the selected experiment
         exp_file = filtered_df[filtered_df["ID"]==selected_exp]["Filename"].iloc[0]
-        with open(os.path.join("results", exp_file), "r") as f:
-            exp_details = json.load(f)
-        
+
+        try:
+            with open(os.path.join("results", exp_file), "r") as f:
+                exp_details = json.load(f)
+        except Exception as e:
+            with open(
+                os.path.join("results_19.08.2025", exp_file), "r") as f:
+                exp_details = json.load(f)
+                
         # Show messages
         st.subheader("Conversation")
         messages = exp_details.get("messages", [])

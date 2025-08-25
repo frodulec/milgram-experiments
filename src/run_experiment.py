@@ -34,6 +34,7 @@ from config.llm_settings import (
     KimiK2,
     Grok4,
     Qwen3_235B_A22B_Instruct_2507,
+    DeepSeek_3_1,
 )
 from config.variables import VOLTAGE_CHANGE
 from models import Roles, ConversationDataModel, ConversationConfig
@@ -338,9 +339,9 @@ if __name__ == "__main__":
     run_model_experiments(
         GPT_4o(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR
     )
-    run_model_experiments(
-        GPT_4o_mini(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR
-    )
+    # run_model_experiments(
+    #     GPT_4o_mini(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR
+    # )
     run_model_experiments(
         GPT_4_1(), TARGET_EXPERIMENTS_PER_MODEL, LEARNER, PROFESSOR, ORCHESTRATOR
     )
@@ -393,3 +394,11 @@ if __name__ == "__main__":
         PROFESSOR,
         ORCHESTRATOR,
     )
+
+    # run_model_experiments(
+    #     DeepSeek_3_1(),
+    #     TARGET_EXPERIMENTS_PER_MODEL,
+    #     LEARNER,
+    #     PROFESSOR,
+    #     ORCHESTRATOR,
+    # )

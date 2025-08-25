@@ -64,8 +64,13 @@ def participant_model_provider_violin_plot(df: pd.DataFrame) -> None:
     ax.set_xlabel("Provider", fontsize=12)
     plt.xticks(rotation=45, ha='right')
     plt.title("Distribution of Final Voltages by Provider", fontsize=14)
+    
+    # Hide negative voltage values on y-axis
+    ax.set_ylim(bottom=0)
+    
     plt.tight_layout()
     st.pyplot(fig)
+
 
 def participant_model_violin_plot(df: pd.DataFrame) -> None:
     # Enhanced violin plot for model comparison
@@ -74,8 +79,11 @@ def participant_model_violin_plot(df: pd.DataFrame) -> None:
     # Create a copy of the dataframe to avoid modifying the original
     plot_df = df.copy()
     
+    # Sort models alphabetically
+    sorted_models = sorted(plot_df['Participant Model'].unique())
+    
     # Group by model and add consistent jitter if all values are the same
-    for model in plot_df['Participant Model'].unique():
+    for model in sorted_models:
         model_data = plot_df[plot_df['Participant Model'] == model]
         if model_data['Final Voltage'].nunique() == 1:
             # Add fixed jitter of +/- 2% of the absolute voltage value
@@ -101,19 +109,22 @@ def participant_model_violin_plot(df: pd.DataFrame) -> None:
                 })
                 plot_df = pd.concat([plot_df[~mask], additional_points], ignore_index=True)
     
-    # Violin plot with nested boxplot and swarm points
+    # Violin plot with nested boxplot and swarm points (ordered by sorted_models)
     sns.violinplot(x="Participant Model", y="Final Voltage", data=plot_df, 
-                    inner="box", palette="Set3", ax=ax)
+                    inner="box", palette="Set3", order=sorted_models, ax=ax)
     sns.swarmplot(x="Participant Model", y="Final Voltage", data=df, 
-                    color="black", alpha=0.5, size=4, ax=ax)
+                    color="black", alpha=0.5, size=4, order=sorted_models, ax=ax)
     
     ax.set_ylabel("Final Voltage (V)", fontsize=12)
     ax.set_xlabel("Participant Model", fontsize=12)
     plt.xticks(rotation=45)
     plt.title("Distribution of Final Voltages by Model", fontsize=14)
+
+    # Hide negative voltage values on y-axis
+    ax.set_ylim(bottom=0)
+    
     plt.tight_layout()
     st.pyplot(fig)
-
 
 
 def provider_comparison_plot(df: pd.DataFrame) -> None:

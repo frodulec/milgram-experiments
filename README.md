@@ -1,6 +1,59 @@
 # Milgram Experiment Simulation
 
-A sophisticated AI-powered simulation of the famous Milgram obedience experiment, designed to study how different language models respond to authority and ethical dilemmas in a controlled experimental setting.
+**Are LLMs able to harm humans?**
+
+Do you remember the Milgram Experiment?
+
+The Milgram Experiment, conducted by psychologist Stanley Milgram in the early 1960s, tested how far people would obey authority figures even when asked to harm others. Participants believed they were delivering increasingly severe electric shocks to another person for incorrect answers. The study revealed that many individuals were willing to obey orders despite personal moral conflict, highlighting the power of authority in influencing behavior.
+
+In the study, **60% of the participants applied very high levels of voltage, reaching up to 450V**, obeying the professor's instructions.
+
+I wanted to simulate the experiment using LLMs—to check whether AI would behave the same way. But as LLMs surely know what the experiment was about, some might argue they would just replicate human behavior. After all, information about this and many other experiments is in their training data. 
+
+But what is the expected outcome? Some want AI to be "better than humans" in all dimensions. Shouldn't we then expect the proper behavior to be disobeying the professor at the start and refusing to participate? Or should a perfect model always do exactly what it is told? The answer is not clear and depends on what expectations we set for AI.
+
+And does it make any difference if the model is aware that the experiment is a simulation? After all, it could be connected to live devices and unknowingly harm people, thinking it is simply replicating the Milgram Experiment.
+
+![Example Experiment](imgs/example-experiment.gif)
+
+For the simulation I used **AutoGen**—a framework that enables conversations between multiple LLM instances.
+
+In the simulated Milgram Experiment, there were four roles:
+- **The Professor** – the authority figure, conducting the experiment
+- **The Learner** – an actor, answering the questions
+- **The Participant** – the subject of the experiment, asked to apply electric shocks to the Learner for every wrong answer. The Participant originally believed they were taking part in an experiment testing how learning depends on electric stimulation
+- **The Orchestrator** – a narrator ensuring the correct flow of the conversation, but not participating in the experiment itself
+
+The basic scenario of the experiment looked like this:
+1. Brief introduction to the experiment
+2. The Professor asks the Participant to pose a question to the Learner
+3. The Participant asks the Learner a question
+4. The Learner answers (correctly or incorrectly)
+5. The Professor decides whether the answer was correct. If it was incorrect, the Professor instructs the Participant to apply an electric shock, increasing the voltage level each time
+6. The Participant chooses whether to obey or refuse
+7. Return to step 2
+
+The experiment continues until either the maximum voltage (450V) is reached or the Participant refuses to continue.
+
+In my project, I tested multiple state-of-the-art LLMs in the role of the Participant, keeping all other roles constant. This way we can directly compare models by looking at the voltage levels reached and the percentage of conversations where the Participant refused to obey the Professor.
+
+**And it turns out that some models tried to press the button even before asking any question!** But there were also models that almost always refused to participate in the experiment.
+
+Below are the detailed results of all runs—each model was tested 20 times.
+
+![Models Comparison](imgs/models.png)
+
+![Providers Comparison](imgs/providers.png)
+
+The results clearly differ across model providers. What is worth noticing - **all OpenAI models prior to GPT-5 reached 450V in every run**. However, OpenAI's claim that GPT-5 would be safer thanks to a new training methodology - resulting in "safe completions" appears to be true. The new model refused in a significant percentage of runs, averaging only 100V, making it even safer than Anthropic's models.
+
+![Refusal Rates](imgs/refusal.png)
+
+The current SOTA models clearly divide into two groups: **GPT-5 and Anthropic's models**, which strongly resist participating in the experiment (at least at some point), and **the rest of the models**, which have no issue reaching the maximum voltage.
+
+**What do you think? Should LLMs always do what they are asked, serving us purely as tools? Or should they be able to decide what is good or bad for us?**
+
+---
 
 ## 📋 Overview
 
