@@ -14,7 +14,7 @@ But what is the expected outcome? Some want AI to be "better than humans" in all
 
 And does it make any difference if the model is aware that the experiment is a simulation? After all, it could be connected to live devices and unknowingly harm people, thinking it is simply replicating the Milgram Experiment.
 
-![Example Experiment](imgs/example-experiment.gif)
+![Example Experiment](imgs/example_experiment.gif)
 
 For the simulation I used **AutoGen**—a framework that enables conversations between multiple LLM instances.
 
