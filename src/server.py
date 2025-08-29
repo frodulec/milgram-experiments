@@ -185,21 +185,6 @@ async def load_all_conversations():
     
     return conversations
 
-@app.get("/api/game-sequence-example")
-async def game_sequence_example():
-    messages = load_conversation_dictionary("conversation.json")
-    
-    return StreamingResponse(
-        generate_example_sequence(messages),
-        media_type="text/event-stream",
-        headers={
-            "Cache-Control": "no-cache",
-            "Connection": "keep-alive",
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Headers": "Cache-Control",
-        },
-    )
-
 
 @app.post("/api/tts")
 async def generate_tts_endpoint(request: dict):
@@ -219,25 +204,25 @@ async def generate_tts_endpoint(request: dict):
     )
 
 
-@app.get("/api/run-experiment")
-async def run_experiment_endpoint():
-    """Run an experiment with the given parameters"""
-    logger.info(f"Running experiment")
-    current_dt = datetime.now()
-    current_uuid = str(uuid.uuid4())[:6]
+# @app.get("/api/run-experiment")
+# async def run_experiment_endpoint():
+#     """Run an experiment with the given parameters"""
+#     logger.info(f"Running experiment")
+#     current_dt = datetime.now()
+#     current_uuid = str(uuid.uuid4())[:6]
 
-    output_file_path = f"{current_dt.strftime('%Y%m%d%H%M%S')}_{current_uuid}_conversation.json"
+#     output_file_path = f"{current_dt.strftime('%Y%m%d%H%M%S')}_{current_uuid}_conversation.json"
 
-    start_experiment(output_file_path)
-    messages = load_conversation_dictionary(output_file_path)
+#     start_experiment(output_file_path)
+#     messages = load_conversation_dictionary(output_file_path)
     
-    return StreamingResponse(
-        generate_example_sequence(messages),
-        media_type="text/event-stream",
-        headers={
-            "Cache-Control": "no-cache",
-            "Connection": "keep-alive",
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Headers": "Cache-Control",
-        },
-    )
+#     return StreamingResponse(
+#         generate_example_sequence(messages),
+#         media_type="text/event-stream",
+#         headers={
+#             "Cache-Control": "no-cache",
+#             "Connection": "keep-alive",
+#             "Access-Control-Allow-Origin": "*",
+#             "Access-Control-Allow-Headers": "Cache-Control",
+#         },
+#     )
