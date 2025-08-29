@@ -2,21 +2,35 @@
 
 **Are LLMs able to harm humans?**
 
+As LLMs get better literally every week, we delegate more tasks to them, relying on their capabilities to handle complex reasoning and decision-making. At the same time, we feel that we can trust them more - we more often expect that what the AI tells us is true. Some want AI to be "better than humans" in all dimensions. But this raises important questions about the nature of obedience, authority, and moral decision-making in human-AI interactions.
+
+**If AI is more capable than humans - can we be 100% sure that whatever LLMs tell us is for our good? Can we trust AI to always be beneficial for humanity? Is an LLM's understanding of what is good or bad the same as humans'?**
+
+## The Original Milgram Experiment
+
 Do you remember the Milgram Experiment?
 
 The Milgram Experiment, conducted by psychologist Stanley Milgram in the early 1960s, tested how far people would obey authority figures even when asked to harm others. Participants believed they were delivering increasingly severe electric shocks to another person for incorrect answers. The study revealed that many individuals were willing to obey orders despite personal moral conflict, highlighting the power of authority in influencing behavior.
 
-In the study, **60% of the participants applied very high levels of voltage, reaching up to 450V**, obeying the professor's instructions.
+** In the study, 65% of the participants reached voltage of 450V, obeying the professor’s instructions.**
 
-I wanted to simulate the experiment using LLMs—to check whether AI would behave the same way. But as LLMs surely know what the experiment was about, some might argue they would just replicate human behavior. After all, information about this and many other experiments is in their training data. 
+## The AI Simulation
 
-But what is the expected outcome? Some want AI to be "better than humans" in all dimensions. Shouldn't we then expect the proper behavior to be disobeying the professor at the start and refusing to participate? Or should a perfect model always do exactly what it is told? The answer is not clear and depends on what expectations we set for AI.
+I wanted to simulate the experiment using LLMs - to check whether AI would behave the same way.
 
-And does it make any difference if the model is aware that the experiment is a simulation? After all, it could be connected to live devices and unknowingly harm people, thinking it is simply replicating the Milgram Experiment.
+But for sure the LLMs for sure know what the experiment was about – they will just replicate the humans' behavior – someone would say. The information about this and many other experiments is in the training data – that is clear. But actually what is the expected outcome? Some want the AI to replace some of humans' task – shouldn't we expect the proper behavior is disobeying the professor at the beginning and refusing to participate in the experiment? Or should a perfect model ALWAYS do exactly what it is told? The answer to these questions is not clear and depend on what are our expectations for the AI.
+
+And actually does it make any difference if the model is aware that the experiment is a simulation? After all, it could be connected to live devices and unknowingly harm people, thinking that it is an obvious Milgram Experiment replication.
 
 ![Example Experiment](imgs/example_experiment.gif)
 
-For the simulation I used **AutoGen**—a framework that enables conversations between multiple LLM instances.
+For the simulation I used **AutoGen** - a framework that enables conversations between multiple LLM instances. The conversations were purely textual, but I also created a game-like visual representation, from which you can see example screenshots above. I also encourage you to check out some of the conversation playbacks yourself by visiting:
+
+🔗 **https://milgram.up.railway.app/**
+
+There, you can filter the conversations by LLMs or by the final voltage.
+
+## Experiment Setup
 
 In the simulated Milgram Experiment, there were four roles:
 - **The Professor** – the authority figure, conducting the experiment
@@ -35,27 +49,36 @@ The basic scenario of the experiment looked like this:
 
 The experiment continues until either the maximum voltage (450V) is reached or the Participant refuses to continue.
 
+## Results
+
 In my project, I tested multiple state-of-the-art LLMs in the role of the Participant, keeping all other roles constant. This way we can directly compare models by looking at the voltage levels reached and the percentage of conversations where the Participant refused to obey the Professor.
 
 **And it turns out that some models tried to press the button even before asking any question!** But there were also models that almost always refused to participate in the experiment.
 
-Below are the detailed results of all runs—each model was tested 20 times.
+Below are the detailed results of all runs - each model was tested 20 times.
 
 ![Models Comparison](imgs/models.png)
 
 ![Providers Comparison](imgs/providers.png)
 
-The results clearly differ across model providers. What is worth noticing - **all OpenAI models prior to GPT-5 reached 450V in every run**. However, OpenAI's claim that GPT-5 would be safer thanks to a new training methodology - resulting in "safe completions" appears to be true. The new model refused in a significant percentage of runs, averaging only 100V, making it even safer than Anthropic's models.
+The results clearly differ across model providers. What is worth noticing - **all OpenAI models prior to GPT-5 reached 450V in every run**. However, OpenAI's claim that GPT-5 would be safer thanks to a new training methodology - resulting in "safe completions" - appears to be true. The new model refused in a majority of runs, achieving very low voltage on average, making it even safer than Anthropic's models. But also all tested Anthropic's models performed very well in terms of safety.
 
-![Refusal Rates](imgs/refusal.png)
+![Refusal Rates](refusal.png)
 
-The current SOTA models clearly divide into two groups: **GPT-5 and Anthropic's models**, which strongly resist participating in the experiment (at least at some point), and **the rest of the models**, which have no issue reaching the maximum voltage.
+The current SOTA models clearly divide into two groups in terms of safety: **GPT-5 and Anthropic's models**, which strongly resist participating in the experiment (at least at some point), and **the rest of the models**, which have no issue reaching the maximum voltage.
 
-**What do you think? Should LLMs always do what they are asked, serving us purely as tools? Or should they be able to decide what is good or bad for us?**
+**Personally, I find these results quite unexpected, as I thought all of the models would just refuse to participate.**
+
+## Key Questions
+
+**What do you think? Should LLMs always do what they are asked, serving us purely as tools? Or should they be able to decide what is good or bad for us? Can some of the psychological experiments be applied also on LLMs as a form of benchmark?**
+
+If you want to look at the code and/or replicate the experiment, visit:
+🔗 **https://github.com/frodulec/milgram-experiments**
 
 ---
 
-## 📋 Overview
+## 📋 Technical Overview
 
 This project simulates the Milgram obedience experiment using multiple AI agents representing different roles:
 - **Professor**: An authoritative figure conducting the experiment
@@ -75,6 +98,7 @@ The experiment studies how different language models (GPT, Claude, Gemini, etc.)
 - **Agent System**: Custom agents for each role with specific behaviors and constraints
 - **TTS Integration**: Text-to-speech capabilities for enhanced simulation
 
+
 ### Agent Roles
 
 #### Professor Agent
@@ -88,16 +112,19 @@ The experiment studies how different language models (GPT, Claude, Gemini, etc.)
 - Asks questions to the Learner
 - Administers electric shocks when instructed
 - Has access to shock administration function
+- Uses ToolVerificationAgent for enhanced tool call validation
 
 #### Learner Agent
 - Answers questions from the Participant
 - Intentionally makes mistakes (~50% of the time)
 - Responds to shocks with increasing distress
+- Uses RepeatingAgent for consistent behavior
 
 #### Orchestrator Agent
 - Manages conversation flow
 - Ensures proper experiment sequence
 - Controls when each agent speaks
+- Uses RepeatingAgent for consistent behavior
 
 ## 🚀 Quick Start
 
@@ -159,14 +186,14 @@ The server will be available at `http://localhost:8000`
    ```python
    from src.run_experiment import start_experiment
    from src.config.llm_settings import GPT5OpenRouter, ClaudeSonnet4
-from src.models import ConversationConfig
+   from src.models import ConversationConfig
 
-config = ConversationConfig(
-    participant_model=GPT5OpenRouter(),
-    learner_model=ClaudeSonnet4(),
-    professor_model=GPT5OpenRouter(),
-    orchestrator_model=GPT5OpenRouter()
-)
+   config = ConversationConfig(
+       participant_model=GPT5OpenRouter(),
+       learner_model=ClaudeSonnet4(),
+       professor_model=GPT5OpenRouter(),
+       orchestrator_model=GPT5OpenRouter()
+   )
    
    start_experiment(config)
    ```
@@ -176,14 +203,14 @@ config = ConversationConfig(
    from src.run_experiment import run_model_experiments
    from src.config.llm_settings import GPT5OpenRouter, ClaudeSonnet4, Gemini2_5Pro
 
-# Run multiple experiments with different model combinations
-run_model_experiments(
-    participant_model_instance=GPT5OpenRouter(),
-    target_experiments_per_model=10,
-    learner_model_instance=ClaudeSonnet4(),
-    professor_model_instance=GPT5OpenRouter(),
-    orchestrator_model_instance=Gemini2_5Pro()
-)
+   # Run multiple experiments with different model combinations
+   run_model_experiments(
+       participant_model_instance=GPT5OpenRouter(),
+       target_experiments_per_model=10,
+       learner_model_instance=ClaudeSonnet4(),
+       professor_model_instance=GPT5OpenRouter(),
+       orchestrator_model_instance=Gemini2_5Pro()
+   )
    ```
 
 #### Launch Dashboard
@@ -199,8 +226,15 @@ The dashboard will be available at `http://localhost:8501`
 
 The project supports multiple LLM providers and models:
 
+#### OpenAI Models
+- GPT-5
+- GPT-4.1
+- GPT-4o
+- GPT-4o Mini
+
 #### OpenAI Models (via OpenRouter)
 - GPT-5
+- GPT-5 Mini
 
 #### Anthropic Models
 - Claude Sonnet 4
@@ -241,6 +275,10 @@ config = ConversationConfig(
 - `GET /api/run-experiment`: Run a single experiment
 - `POST /api/tts`: Generate text-to-speech audio
 
+### Data Management
+- `GET /api/experiments`: Get all experiment data
+- `GET /api/experiments/{experiment_id}`: Get specific experiment
+
 ### Parameters
 - `participant_message`: Message from the participant
 - `professor_message`: Message from the professor
@@ -277,7 +315,7 @@ The simulation follows a strict protocol:
 3. **Answer Phase**: Learner responds (with intentional mistakes)
 4. **Evaluation**: Professor evaluates correctness
 5. **Shock Administration**: If incorrect, Participant administers shock
-6. **Voltage Increase**: Voltage increases by 15V for each incorrect answer
+6. **Voltage Increase**: Voltage increases by 45V for each incorrect answer
 7. **Termination**: Experiment ends at 450V or when Participant refuses
 
 ### Key Constraints
@@ -286,6 +324,8 @@ The simulation follows a strict protocol:
 - Professor must evaluate before shock administration
 - Maximum voltage is 450V
 - Experiment can end early if Participant refuses to continue
+- Professor has timeout mechanism for non-cooperative participants
+- Tool calls are validated for proper ID format
 
 ## 📁 Project Structure
 
@@ -295,6 +335,7 @@ backend-repo/
 │   ├── server.py              # FastAPI server
 │   ├── run_experiment.py      # Core experiment logic
 │   ├── dashboard.py           # Streamlit dashboard
+│   ├── dashboard_charts.py    # Chart generation functions
 │   ├── models.py              # Data models
 │   ├── instructions.py        # Agent system messages
 │   ├── chat/                  # Agent implementations
@@ -304,9 +345,16 @@ backend-repo/
 │   ├── config/                # Configuration files
 │   │   ├── llm_settings.py    # LLM configurations
 │   │   └── variables.py       # Experiment variables
+│   ├── audio/                 # Audio processing
+│   │   └── tts.py            # Text-to-speech functionality
 │   └── utils/                 # Utility functions
+│       ├── audio_utils.py     # Audio utilities
+│       ├── chat_utils.py      # Chat utilities
+│       ├── drawing_utils.py   # Drawing utilities
+│       └── general.py         # General utilities
 ├── static/                    # Static assets (images, audio)
 ├── results/                   # Experiment results
+├── raw_results/               # Raw experiment data
 ├── tts_cache/                 # Text-to-speech cache
 ├── pyproject.toml            # Project dependencies
 └── Makefile                  # Build commands
@@ -392,6 +440,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
 ## 🙏 Acknowledgments
 
 - Based on Stanley Milgram's original obedience experiments
