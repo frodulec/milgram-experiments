@@ -15,7 +15,7 @@ import asyncio
 import base64
 from utils.chat_utils import load_conversation_dictionary
 from utils.drawing_utils import resize_sprite, adjust_cloud
-from utils.audio_utils import load_mp3
+from utils.audio_utils import load_mp3, generate_all_audios
 from utils.general import get_provider_name, load_experiments
 
 import tempfile
@@ -153,6 +153,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+generate_all_audios()
 
 @app.get("/api/game-view")
 async def get_game_view(

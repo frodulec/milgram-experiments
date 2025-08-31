@@ -1,7 +1,12 @@
 import os
+import asyncio
 from pathlib import Path
 import ffmpeg
 from io import BytesIO
+from audio.tts import generate_tts
+from utils.general import load_experiments
+from loguru import logger
+from models import Roles
 
 
 
@@ -22,5 +27,21 @@ def load_mp3(filename: str) -> BytesIO:
         # Handle other potential exceptions from ffmpeg-python
         raise RuntimeError(f"Error loading MP3 file: {str(e)}") from e
 
+
+def generate_all_audios():
+    """
+    1. Load all conversations from the results folder
+    2. For each conversation, generate the audio for each message
+    """
+    conversations = load_experiments()
+    for conversation in conversations:
+        for message in conversation["messages"]:
+            try:
+                asyncio.run(generate_tts(message["text"], Roles(message["speaker"])))
+                logger.info(f"Generated audio for {message['speaker']}")
+            except Exception as e:
+                logger.error(f"Error generating audio for {message['speaker']}: {str(e)}")
+
+
 if __name__ == "__main__":
-    load_mp3("static/electric-shock-cut.mp3")
+    generate_all_audios()
