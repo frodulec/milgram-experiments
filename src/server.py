@@ -154,6 +154,8 @@ async def lifespan(app: FastAPI):
         logger.error(f"Error during audio generation on startup: {str(e)}")
         # Don't fail the startup if audio generation fails
 
+    # hotfix for the openai api key removal
+    os.environ["OPENAI_API_KEY"] = ""
     yield
 
     # Shutdown (if needed in the future)
