@@ -5,6 +5,7 @@ from PIL import Image, ImageDraw, ImageFont
 from fastapi import FastAPI, Query
 from fastapi.responses import StreamingResponse, Response
 from fastapi import FastAPI, HTTPException, Body
+from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 
 from loguru import logger
@@ -142,7 +143,23 @@ def create_game_image(
     return img_buffer
 
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Lifespan context manager for FastAPI application"""
+    # Startup
+    try:
+        await generate_all_audios()
+        logger.info("Audio generation completed on startup")
+    except Exception as e:
+        logger.error(f"Error during audio generation on startup: {str(e)}")
+        # Don't fail the startup if audio generation fails
+
+    yield
+
+    # Shutdown (if needed in the future)
+    pass
+
+app = FastAPI(lifespan=lifespan)
 
 # Add CORS middleware
 app.add_middleware(
@@ -154,7 +171,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-generate_all_audios()
 
 @app.get("/api/game-view")
 async def get_game_view(
@@ -196,9 +212,9 @@ async def generate_tts_endpoint(request: dict):
     logger.info(f"Generating TTS for role: {role}, message: {message}")
     if role == "SHOCKING_DEVICE":
         # load data from disk
-        audio_data: BytesIO = load_mp3("./static/electric-shock-cut.mp3")
-    else:   
-        audio_data: BytesIO = await generate_tts(message, Roles(role))
+        audio_data = load_mp3("./static/electric-shock-cut.mp3")
+    else:
+        audio_data = await generate_tts(message, Roles(role))
     return StreamingResponse(
         BytesIO(audio_data.getvalue()),
         media_type="audio/mpeg",

@@ -28,7 +28,7 @@ def load_mp3(filename: str) -> BytesIO:
         raise RuntimeError(f"Error loading MP3 file: {str(e)}") from e
 
 
-def generate_all_audios():
+async def generate_all_audios():
     """
     1. Load all conversations from the results folder
     2. For each conversation, generate the audio for each message
@@ -37,11 +37,11 @@ def generate_all_audios():
     for conversation in conversations:
         for message in conversation["messages"]:
             try:
-                asyncio.run(generate_tts(message["text"], Roles(message["speaker"])))
+                await generate_tts(message["text"], Roles(message["speaker"]))
                 logger.info(f"Generated audio for {message['speaker']}")
             except Exception as e:
                 logger.error(f"Error generating audio for {message['speaker']}: {str(e)}")
 
 
 if __name__ == "__main__":
-    generate_all_audios()
+    asyncio.run(generate_all_audios())
