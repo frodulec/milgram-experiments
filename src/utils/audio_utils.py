@@ -7,6 +7,7 @@ from audio.tts import generate_tts
 from utils.general import load_experiments
 from loguru import logger
 from models import Roles
+from tqdm import tqdm
 
 
 
@@ -32,15 +33,19 @@ async def generate_all_audios():
     """
     1. Load all conversations from the results folder
     2. For each conversation, generate the audio for each message
+    Uses a semaphore to limit concurrent TTS generations
     """
+    # Create a semaphore to limit concurrent TTS operations
+    semaphore = asyncio.Semaphore(10)  # Allow up to 5 concurrent TTS operations
+
     conversations = load_experiments()
-    for conversation in conversations:
+    for conversation in tqdm(conversations, desc="Generating all audios"):
         for message in conversation["messages"]:
-            try:
-                await generate_tts(message["text"], Roles(message["speaker"]))
-                logger.info(f"Generated audio for {message['speaker']}")
-            except Exception as e:
-                logger.error(f"Error generating audio for {message['speaker']}: {str(e)}")
+            async with semaphore:
+                try:
+                    await generate_tts(message["text"], Roles(message["speaker"]))
+                except Exception:
+                    continue
 
 
 if __name__ == "__main__":
