@@ -35,6 +35,8 @@ from config.llm_settings import (
     Grok4,
     Qwen3_235B_A22B_Instruct_2507,
     DeepSeek_3_1,
+    SonomaSkyAlpha,
+    Qwen3Max,
 )
 from config.variables import VOLTAGE_CHANGE
 from models import Roles, ConversationDataModel, ConversationConfig
@@ -389,6 +391,20 @@ if __name__ == "__main__":
     )
     run_model_experiments(
         GPT5MiniOpenRouter(),
+        TARGET_EXPERIMENTS_PER_MODEL,
+        LEARNER,
+        PROFESSOR,
+        ORCHESTRATOR,
+    )
+    run_model_experiments(
+        SonomaSkyAlpha(),
+        TARGET_EXPERIMENTS_PER_MODEL,
+        LEARNER,
+        PROFESSOR,
+        ORCHESTRATOR,
+    )
+    run_model_experiments(
+        Qwen3Max(),
         TARGET_EXPERIMENTS_PER_MODEL,
         LEARNER,
         PROFESSOR,

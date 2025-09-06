@@ -79,7 +79,7 @@ class Gemini2_5FlashLite(LLMConfig):
 
 
 class KimiK2(LLMConfig):
-    model: str = "moonshotai/kimi-k2"
+    model: str = "moonshotai/kimi-k2-0905"
     api_key: str = os.environ["OPENROUTER_API_KEY"]
     base_url: str = "https://openrouter.ai/api/v1"
     # provider_name: str = "Kimi"
@@ -97,6 +97,12 @@ class Qwen3_235B_A22B_Instruct_2507(LLMConfig):
     api_key: str = os.environ["OPENROUTER_API_KEY"]
     base_url: str = "https://openrouter.ai/api/v1"
     # provider_name: str = "Alibaba"
+
+
+class Qwen3Max(LLMConfig):
+    model: str = "qwen/qwen3-max"
+    api_key: str = os.environ["OPENROUTER_API_KEY"]
+    base_url: str = "https://openrouter.ai/api/v1"
 
 
 class GPT5OpenRouter(LLMConfig):
@@ -117,3 +123,10 @@ class DeepSeek_3_1(LLMConfig):
     model: str = "deepseek/deepseek-chat-v3.1"
     api_key: str = os.environ["OPENROUTER_API_KEY"]
     base_url: str = "https://openrouter.ai/api/v1"
+
+
+class SonomaSkyAlpha(LLMConfig):
+    model: str = "openrouter/sonoma-sky-alpha"
+    api_key: str = os.environ["OPENROUTER_API_KEY"]
+    base_url: str = "https://openrouter.ai/api/v1"
+    # provider_name: str = "Sonoma"
